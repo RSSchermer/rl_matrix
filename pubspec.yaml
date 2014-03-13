@@ -1,0 +1,6 @@
+name: rolab_vector_math
+version: 0.0.1
+author: R.S. Schermer
+description: Utility library for vector math.
+dependencies:
+  collection: any
