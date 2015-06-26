@@ -1,0 +1,7 @@
+library matrix;
+
+import 'package:collection/wrappers.dart';
+import 'dart:math';
+
+part 'src/matrix.dart';
+part 'src/lu_decomposition.dart';
