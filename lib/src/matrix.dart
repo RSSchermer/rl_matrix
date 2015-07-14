@@ -23,10 +23,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// the first row, the second 5 values make up the second row, etc.
   final UnmodifiableListView<num> _values;
 
-  /// Memoization of column packed values.
+  /// Memoizated column packed values.
   UnmodifiableListView<num> _valuesColumnPacked;
 
-  /// Memoization of inverse matrix.
+  /// Memoized inverse matrix.
   Self _inverse;
 
   /// Creates a matrix from the given list with the given column dimension.

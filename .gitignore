@@ -1,6 +1,7 @@
 *.class
 *.pyc
 *.pyo
+.pub
 packages
 .project
 pubspec.lock
