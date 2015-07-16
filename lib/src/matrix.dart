@@ -79,10 +79,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///
   /// Returns the values at the given coordinates, where the first coordinate
   /// specifies the row and the second coordinate specifies the column. Row and
-  /// column indices start at 1, so (1, 1) identifies the top left value in the
+  /// column indices start at 0, so (0, 0) identifies the top left value in the
   /// matrix.
   num valueAt(int row, int column) =>
-    _values[(row - 1) * columnDimension + column - 1];
+    _values[row * columnDimension + column];
 
   /// Returns the values in the matrix, column-packed.
   ///
@@ -90,12 +90,14 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// for a matrix with a row dimension of 5, the first 5 values make up the
   /// first column, the second 5 values make up the second column, etc.
   Iterable<num> get valuesColumnPacked {
-    if (_valuesColumnPacked != null) return _valuesColumnPacked;
+    if (_valuesColumnPacked != null) {
+      return _valuesColumnPacked;
+    }
 
-    var values = new List<num>();
+    var values = new List();
         
-    for (var column = 1; column <= columnDimension; column++) {
-      for (var row = 1; row <= rowDimension; row++) {
+    for (var column = 0; column < columnDimension; column++) {
+      for (var row = 0; row < rowDimension; row++) {
         values.add(valueAt(row, column));
       }
     }
@@ -115,18 +117,49 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Alias for `valuesRowPacked`
   Iterable<num> get values => _values;
 
+  /// Returns a new sub-matrix.
+  ///
+  /// Takes 4 arguments: the starting row's index, the ending row's index, the
+  /// starting column's index and the ending column's index. Indexes start at
+  /// zero. The resulting sub-matrix will be the sub-section of the matrix
+  /// delineated by these indices. The given indices are inclusive, meaning that
+  /// a starting row index of 0 will include the first row in the sub-matrix.
+  ///
+  /// Throws an [ArgumentError] if the starting row index is greater than the
+  /// ending row index, or the starting column index is greater than the
+  /// ending column index.
+  GenericMatrix subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) {
+    if (rowStart > rowEnd) {
+      throw new ArgumentError("Ending row index may not be bigger than starting row index.");
+    }
+
+    if (colStart > colEnd) {
+      throw new ArgumentError("Ending column index may not be bigger than starting column index.");
+    }
+
+    var subMatrixVals = new List();
+
+    for (var i = rowStart; i <= rowEnd; i++) {
+      for (var j = colStart; j <= colEnd; j++) {
+        subMatrixVals.add(valueAt(i, j));
+      }
+    }
+
+    return new Matrix(subMatrixVals, colEnd - colStart + 1);
+  }
+
   /// Computes the entrywise sum matrix with another matrix.
   ///
   /// Computes the entrywise sum matrix `C` of the matrix `A` with another
   /// matrix `B`: `A + B = C`, where each value `C_ij` at coordinates (i, j) in
   /// matrix `C`, is equal to `A_ij + B_ij`.
-  Self entrywiseSum(GenericMatrix m) {
-    _assertEqualDimensions(m);
+  Self entrywiseSum(GenericMatrix B) {
+    _assertEqualDimensions(B);
     
-    var summedValues = new List<num>();
+    var summedValues = new List();
     
     for (var i = 0; i < _values.length; i++) {
-      summedValues.add(_values[i] + m._values[i]);
+      summedValues.add(_values[i] + B._values[i]);
     }
     
     return copy(summedValues);
@@ -137,13 +170,13 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Computes the entrywise difference matrix `C` of the matrix `A` with
   /// another matrix `B`: `A - B = C`, where each value `C_ij` at coordinates
   /// (i, j) in matrix `C`, is equal to `A_ij - B_ij`.
-  Self entrywiseDifference(GenericMatrix m) {
-    _assertEqualDimensions(m);
+  Self entrywiseDifference(GenericMatrix B) {
+    _assertEqualDimensions(B);
     
-    var differenceValues = new List<num>();
+    var differenceValues = new List();
     
     for (var i = 0; i < _values.length; i++) {
-      differenceValues.add(_values[i] - m._values[i]);
+      differenceValues.add(_values[i] - B._values[i]);
     }
 
     return copy(differenceValues);
@@ -165,29 +198,28 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Computes the product matrix `C`, the matrix product of the matrix `A` with
   /// another matrix `B`: `AB = C`. The column dimension of `A` must match the
   /// row dimension of `B`.
-  GenericMatrix matrixProduct(GenericMatrix m) {
-    if (columnDimension != m.rowDimension) {
+  GenericMatrix matrixProduct(GenericMatrix B) {
+    if (columnDimension != B.rowDimension) {
       throw new ArgumentError("Matrix inner dimensions must agree.");
     }
 
-    var productValues = new List<num>();
-    var mColumnPacked = m.valuesColumnPacked;
-    var mCols = m.columnDimension;
-    var sum;
+    var productValues = new List();
+    var bColumnPacked = B.valuesColumnPacked;
+    var bCols = B.columnDimension;
 
     for (var row = 0; row < rowDimension; row++) {
-      for (var col = 0; col < mCols; col++) {
-        sum = 0;
+      for (var col = 0; col < bCols; col++) {
+        var sum = 0;
 
         for (var j = 0; j < columnDimension; j++) {
-          sum += _values[row * columnDimension + j] * mColumnPacked[col * columnDimension + j];
+          sum += _values[row * columnDimension + j] * bColumnPacked[col * columnDimension + j];
         }
 
         productValues.add(sum);
       }
     }
 
-    return new Matrix(productValues, m.columnDimension);
+    return new Matrix(productValues, B.columnDimension);
   }
 
   /// Computes the Hadamard product of the matrix with another matrix.
@@ -195,13 +227,13 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Computes the Hadamard product, or entrywise product, `C` of the matrix `A`
   /// with another matrix `B`. Each value `C_ij` at coordinates (i, j) in matrix
   /// `C`, is equal to `A_ij * B_ij`.
-  Self hadamardProduct(GenericMatrix m) {
-    _assertEqualDimensions(m);
+  Self hadamardProduct(GenericMatrix B) {
+    _assertEqualDimensions(B);
 
-    var productValues = new List<num>();
+    var productValues = new List();
 
     for (var i = 0; i < _values.length; i++) {
-      productValues.add(_values[i] * m._values[i]);
+      productValues.add(_values[i] * B._values[i]);
     }
 
     return copy(productValues);
@@ -220,7 +252,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
   /// Returns the inverse matrix of the matrix.
   Self get inverse {
-    if (_inverse != null) return _inverse;
+    if (_inverse != null) {
+      return _inverse;
+    }
 
     var numberList;
     
@@ -232,14 +266,14 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Computes the entrywise sum matrix `C` of the matrix `A` with another
   /// matrix `B`: `A + B = C`, where each value `C_ij` at coordinates (i, j) in
   /// matrix `C`, is equal to `A_ij + B_ij`.
-  Self operator +(GenericMatrix m) => entrywiseSum(m);
+  Self operator +(GenericMatrix B) => entrywiseSum(B);
 
   /// Computes the entrywise difference matrix with another matrix.
   ///
   /// Computes the entrywise difference matrix `C` of the matrix `A` with
   /// another matrix `B`: `A - B = C`, where each value `C_ij` at coordinates
   /// (i, j) in matrix `C`, is equal to `A_ij - B_ij`.
-  Self operator -(GenericMatrix m) => entrywiseDifference(m);
+  Self operator -(GenericMatrix B) => entrywiseDifference(B);
 
   /// Returns the scalar product for numerical values and the matrix product
   /// for matrix values.

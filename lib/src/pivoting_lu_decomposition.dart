@@ -2,7 +2,7 @@ part of matrix;
 
 /// The lower-upper factor decomposition of a matrix, with partial pivoting.
 ///
-/// Lower-upper factor decomposition with partial pivoting of an M x N Matrix A,
+/// Lower-upper factor decomposition with partial pivoting of an M x N matrix A,
 /// results in 3 matrices:
 ///
 /// - L: the lower factor matrix. An M x N matrix with all zero's above the
@@ -45,10 +45,10 @@ class PivotingLUDecomposition {
   /// The pivot sign.
   num _pivotSign = 1;
 
-  /// The matrix's row dimension.
+  /// The decomposed matrix's row dimension.
   num _rows;
 
-  /// The matrix's column dimension
+  /// The decomposed matrix's column dimension
   num _cols;
 
   /// Memoized lower factor.
@@ -133,7 +133,9 @@ class PivotingLUDecomposition {
   ///
   /// A matrix with all zero's above the diagonal.
   GenericMatrix get lowerFactor {
-    if (_lowerFactor != null) return _lowerFactor;
+    if (_lowerFactor != null) {
+      return _lowerFactor;
+    }
 
     var values = new List();
 
@@ -158,7 +160,9 @@ class PivotingLUDecomposition {
   ///
   /// A matrix with all zero's below the diagonal.
   GenericMatrix get upperFactor {
-    if (_upperFactor != null) return _upperFactor;
+    if (_upperFactor != null) {
+      return _upperFactor;
+    }
 
     var values = new List();
 
@@ -181,7 +185,9 @@ class PivotingLUDecomposition {
   ///
   /// A permutation matrix.
   GenericMatrix get pivotMatrix {
-    if (_pivotMatrix != null) return _pivotMatrix;
+    if (_pivotMatrix != null) {
+      return _pivotMatrix;
+    }
 
     var values = new List();
 
@@ -204,8 +210,13 @@ class PivotingLUDecomposition {
   ///
   /// Throws an [UnsupportedError] if the decomposed matrix is not square.
   num get determinant {
-    if (!matrix.isSquare) throw new UnsupportedError("Matrix must be square.");
-    if (_determinant != null) return _determinant;
+    if (!matrix.isSquare) {
+      throw new UnsupportedError('Matrix must be square.');
+    }
+
+    if (_determinant != null) {
+      return _determinant;
+    }
 
     _determinant = _pivotSign;
 
@@ -224,11 +235,11 @@ class PivotingLUDecomposition {
   /// Throws an [UnsupportedError] if A is not square.
   GenericMatrix solve (GenericMatrix B) {
     if (B.rowDimension != _rows) {
-      throw new ArgumentError("Matrix row dimensions must agree.");
+      throw new ArgumentError('Matrix row dimensions must agree.');
     }
 
     if (!isNonsingular) {
-      throw new UnsupportedError("Matrix is singular.");
+      throw new UnsupportedError('Matrix is singular.');
     }
 
     // Copy right hand side with pivoting

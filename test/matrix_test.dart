@@ -69,20 +69,20 @@ void main() {
       var m = new Matrix([0, 1, 2,
                           3, 4, 5], 3);
 
-      test('(1, 1)', () {
-        expect(m.valueAt(1, 1), equals(0));
+      test('(0, 0)', () {
+        expect(m.valueAt(0, 0), equals(0));
       });
 
-      test('(1, 3)', () {
-        expect(m.valueAt(1, 3), equals(2));
+      test('(0, 2)', () {
+        expect(m.valueAt(0, 2), equals(2));
       });
 
-      test('(2, 1)', () {
-        expect(m.valueAt(2, 1), equals(3));
+      test('(1, 0)', () {
+        expect(m.valueAt(1, 0), equals(3));
       });
 
-      test('(2, 3)', () {
-        expect(m.valueAt(2, 3), equals(5));
+      test('(1, 2)', () {
+        expect(m.valueAt(1, 2), equals(5));
       });
     });
 
@@ -100,6 +100,39 @@ void main() {
                           1, 2, 3], 3);
 
       expect(m.valuesRowPacked, equals([1, 2, 3, 1, 2, 3, 1, 2, 3]));
+    });
+
+    group('subMatrix', () {
+      test('throws and error when the starting row index is greater than the ending row index', () {
+        var m = new Matrix([1, 2, 3,
+                            1, 2, 3,
+                            1, 2, 3], 3);
+
+        expect(() => m.subMatrix(1, 0, 0, 2), throwsArgumentError);
+      });
+
+      test('throws and error when the starting column index is greater than the ending column index', () {
+        var m = new Matrix([1, 2, 3,
+                            1, 2, 3,
+                            1, 2, 3], 3);
+
+        expect(() => m.subMatrix(0, 2, 1, 0), throwsArgumentError);
+      });
+
+      group('returns a new matrix', () {
+        var m = new Matrix([1, 2, 3,
+                            4, 5, 6,
+                            7, 8, 9], 3);
+        var subMatrix = m.subMatrix(1, 2, 1, 2);
+
+        test('with the expected values', () {
+          expect(subMatrix.values, equals([5, 6, 8, 9]));
+        });
+
+        test('with the expected column dimensions', () {
+          expect(subMatrix.columnDimension, equals(2));
+        });
+      });
     });
 
     group('entrywiseSum', () {

@@ -1,12 +1,9 @@
 import 'package:test/test.dart';
 import 'package:rl-matrix/matrix.dart';
+import 'helpers.dart';
 
 void main() {
   group('Lower-upper factor decomposition with pivoting:', () {
-    pairWiseDifferenceLessThan(List<num> values, num delta) {
-      return pairwiseCompare(values, (a, b) => (a - b).abs() < delta, 'Pair-wise difference < $delta');
-    }
-
     group('isNonsingular', () {
       test('throws an error is the matrix is not square', () {
         var matrix = new Matrix([6,  1,
