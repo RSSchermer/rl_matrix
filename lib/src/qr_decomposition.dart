@@ -1,5 +1,13 @@
 part of matrix;
 
+/// The QR-decomposition of a matrix.
+///
+/// Decomposes an M x N matrix A, with M >= N, into an M x N orthogonal matrix Q
+/// and an N x N upper rectangular matrix R, such that `A = QR`.
+///
+/// The primary use of the QR-decomposition is in the least squares solution of
+/// non-square systems of simultaneous linear equations. This will fail if the
+/// matrix is rank deficient.
 class QRDecomposition {
 
   /// The source matrix.
@@ -10,20 +18,25 @@ class QRDecomposition {
   /// QR decomposition values.
   List<num> _QR;
 
+  /// The values on the diagonal of the upper rectangular factor.
   List<num> _Rdiag = new List();
 
   /// The decomposed matrix's row dimension.
   num _rows;
 
-  /// The decomposed matrix's column dimension
+  /// The decomposed matrix's column dimension.
   num _cols;
 
+  /// Memoized Householder matrix.
   GenericMatrix _householderMatrix;
 
+  /// Memoized upper triangular factor.
   GenericMatrix _upperTriangularFactor;
 
+  /// Memoized orthogonal factor.
   GenericMatrix _orthogonalFactor;
 
+  /// Creates a new QR-decomposition for the given matrix.
   QRDecomposition(GenericMatrix matrix)
       : matrix = matrix,
         _QR = matrix.valuesRowPacked.toList(),
@@ -73,6 +86,7 @@ class QRDecomposition {
     }
   }
 
+  /// Whether or not the matrix is full rank.
   bool get isFullRank {
     for (var j = 0; j < _cols; j++) {
       if (_Rdiag[j] == 0) {
@@ -83,6 +97,9 @@ class QRDecomposition {
     return true;
   }
 
+  /// The Householder matrix.
+  ///
+  /// Lower trapezoidal matrix whose columns define the reflections.
   GenericMatrix get householderMatrix {
     if(_householderMatrix != null) return _householderMatrix;
 
@@ -103,6 +120,7 @@ class QRDecomposition {
     return _householderMatrix;
   }
 
+  /// The upper triangular factor.
   GenericMatrix get upperTriangularFactor {
     if(_upperTriangularFactor != null) return _upperTriangularFactor;
 
@@ -125,6 +143,7 @@ class QRDecomposition {
     return _upperTriangularFactor;
   }
 
+  /// The orthogonal factor.
   GenericMatrix get orthogonalFactor {
     if(_orthogonalFactor != null) return _orthogonalFactor;
 
@@ -161,6 +180,11 @@ class QRDecomposition {
     return _orthogonalFactor;
   }
 
+  /// Solves `AX=B` for X, where A is the decomposed matrix and B the given
+  /// matrix.
+  ///
+  /// Throws an [ArgumentError] if the row dimensions of A and B do not match.
+  /// Throws an [UnsupportedError] if A is rank deficient (not full rank).
   GenericMatrix solve(GenericMatrix B) {
     if (B.rowDimension != _rows) {
       throw new ArgumentError('Matrix row dimensions must agree.');

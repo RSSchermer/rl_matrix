@@ -48,7 +48,7 @@ class PivotingLUDecomposition {
   /// The decomposed matrix's row dimension.
   num _rows;
 
-  /// The decomposed matrix's column dimension
+  /// The decomposed matrix's column dimension.
   num _cols;
 
   /// Memoized lower factor.
