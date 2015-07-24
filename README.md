@@ -1,7 +1,7 @@
 # RL-matrix
 
-Provides an immutable matrix implementation for Dart, based on Java's 
-[JAMA package](http://math.nist.gov/javanumerics/jama/). 
+Provides an immutable implementation for matrices of real numbers in Dart, based 
+on Java's [JAMA package](http://math.nist.gov/javanumerics/jama/). 
 
 ## Usage
 
