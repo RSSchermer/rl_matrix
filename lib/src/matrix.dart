@@ -5,12 +5,33 @@ part of matrix;
 /// Generic implementation for matrix operations. This implements an immutable
 /// matrix data structure, meaning that all operations will return a new matrix.
 ///
-/// This takes two type parameters: the self type and the type of the transpose.
-/// This is to facilitate easy definition of subtypes for specific matrix
-/// dimensions (e.g. Vec3, Mat4x4, etc.), either for more efficient dimension
-/// specific operation overrides, or to be able to use Dart's type system to
-/// constrain matrix types in function signatures to matrices of specific
+/// This class exists to facilitate easy definition of subtypes for specific
+/// matrix dimensions (e.g. Vec3, Mat4, etc.), either for more efficient
+/// dimension specific operation overrides, or to be able to use Dart's type
+/// system to constrain matrix types in function signatures to specific
 /// dimensions.
+///
+/// This class takes 2 type parameters: the extending class' type (a self-bound)
+/// and the extending class' tranpose type. Also, two abstract methods will need
+/// to be defined:
+///
+/// - `withValues`: needs to return a new matrix of the same type and with the
+///   same dimensions, with the given values.
+/// - `transposeWithValues`: needs to return a new matrix of the matrix's
+///   transpose type, with transposed dimensions, with the given values.
+///
+/// The following example implements a column vector:
+///
+///     class ColumnVector extends GenericMatrix<ColumnVector, RowVector> {
+///       ColumnVector(List<num> values) : super.fromList(values, 1);
+///
+///       ColumnVector withValues(List<num> newValues) =>
+///         new ColumnVector(newValues);
+///
+///       RowVector transposeWithValues(List<num> newValues) =>
+///         new RowVector(newValues);
+///     }
+///
 abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transpose extends GenericMatrix> {
 
   /// The matrix's column dimension (number of columns)
@@ -23,17 +44,39 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// the first row, the second 5 values make up the second row, etc.
   final UnmodifiableListView<num> _values;
 
-  /// Memoizated column packed values.
+  /// Memoized column packed values.
   UnmodifiableListView<num> _valuesColumnPacked;
 
+  /// Memoized LU-decomposition.
+  PivotingLUDecomposition _luDecompostion;
+
+  /// Memoized QR-decomposition.
+  ReducedQRDecomposition _qrDecomposition;
+
   /// Memoized inverse matrix.
-  Self _inverse;
+  Transpose _inverse;
+
+  /// Memoized left inverse matrix.
+  Transpose _leftInverse;
+
+  /// Memoized right inverse matrix.
+  Transpose _rightInverse;
 
   /// Creates a matrix from the given list with the given column dimension.
   ///
   /// Creates a matrix from the given list with the given column dimension. the
   /// row dimension will be inferred from the list length. The list length must
-  /// be a multiple of the column dimension
+  /// be a multiple of the column dimension.
+  ///
+  /// Throws [ArgumentError] if the value list's length is not a multiple of the
+  /// column dimension.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 2 3
+  ///     // 4 5 6
+  ///     var matrix = new Matrix.fromList([1, 2, 3,
+  ///                                       4, 5, 6], 3);
+  ///
   GenericMatrix.fromList(List<num> values, this.columnDimension)
       : _values = new UnmodifiableListView(values) {
     if (values.length % columnDimension != 0) {
@@ -43,11 +86,25 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
   /// Creates a constant matrix of the specified value with the specified
   /// dimensions.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 1 1
+  ///     // 1 1 1
+  ///     // 1 1 1
+  ///     var matrix = new Matrix.constant(1, 3, 3)
+  ///
   GenericMatrix.constant(num value, int rowDimension, int columnDimension)
       : columnDimension = columnDimension,
         _values =  new UnmodifiableListView(new List.filled(columnDimension * rowDimension, value));
 
-  /// Creates a matrix of only zeros with the specified dimensions
+  /// Creates a matrix of only zeros with the specified dimensions.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 0 0 0 0
+  ///     // 0 0 0 0
+  ///     // 0 0 0 0
+  ///     var matrix = new Matrix.zero(3, 4)
+  ///
   GenericMatrix.zero(int rowDimension, int columnDimension)
       : this.constant(0, rowDimension, columnDimension);
 
@@ -55,18 +112,28 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///
   /// Creates an square identity matrix (ones on the diagonal, zeros elsewhere)
   /// of the specified size.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 0 0 0
+  ///     // 0 1 0 0
+  ///     // 0 0 1 0
+  ///     // 0 0 0 1
+  ///     var matrix = new Matrix.identity(4)
+  ///
   GenericMatrix.identity(int size)
       : columnDimension = size,
         _values = new UnmodifiableListView(_identityValues(size));
 
-  /// Creates a new instance of this matrix type of equal dimensions.
-  ///
-  /// Creates a new instance of this matrix type of equal dimensions, optionally
-  /// with a new set of values populating the matrix.
-  Self copy([List<num> newValues]);
+  /// Creates a new instance of this matrix type of equal dimensions, with the
+  /// given values.
+  Self withValues(List<num> newValues);
+
+  /// Creates a new instance of this matrix's transpose type of transposed
+  /// dimensions, with the given values.
+  Transpose transposeWithValues(List<num> newValues);
 
   /// The transpose of the matrix.
-  Transpose get transpose;
+  Transpose get transpose => transposeWithValues(valuesColumnPacked);
 
   /// The row dimension of the matrix (number of rows).
   int get rowDimension => _values.length ~/ columnDimension;
@@ -162,7 +229,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
       summedValues.add(_values[i] + B._values[i]);
     }
     
-    return copy(summedValues);
+    return withValues(summedValues);
   }
 
   /// Computes the entrywise difference matrix with another matrix.
@@ -179,7 +246,24 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
       differenceValues.add(_values[i] - B._values[i]);
     }
 
-    return copy(differenceValues);
+    return withValues(differenceValues);
+  }
+
+  /// Computes the entrywise product of the matrix with another matrix.
+  ///
+  /// Computes the entrywise (Hadamard) product `C` of the matrix `A` with
+  /// another matrix `B`. Each value `C_ij` at coordinates (i, j) in matrix `C`,
+  /// is equal to `A_ij * B_ij`.
+  Self entrywiseProduct(GenericMatrix B) {
+    _assertEqualDimensions(B);
+
+    var productValues = new List();
+
+    for (var i = 0; i < _values.length; i++) {
+      productValues.add(_values[i] * B._values[i]);
+    }
+
+    return withValues(productValues);
   }
 
   /// Multiply the matrix with a scalar value.
@@ -190,7 +274,18 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   Self scalarProduct(num s) {
     var multipliedValues = new List.from(_values).map((v) => s * v);
 
-    return copy(multipliedValues.toList());
+    return withValues(multipliedValues.toList());
+  }
+
+  /// Divide the matrix by a scalar value.
+  ///
+  /// Computes a new matrix `B` of this matrix `A` divided by a scalar s:
+  /// `A / s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
+  /// is equal to `A_ij / s`.
+  Self scalarDivision(num s) {
+    var dividedValues = new List.from(_values).map((v) => s / v);
+
+    return withValues(dividedValues.toList());
   }
 
   /// Computes the matrix product of the matrix with another matrix.
@@ -222,43 +317,93 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return new Matrix(productValues, B.columnDimension);
   }
 
-  /// Computes the Hadamard product of the matrix with another matrix.
-  ///
-  /// Computes the Hadamard product, or entrywise product, `C` of the matrix `A`
-  /// with another matrix `B`. Each value `C_ij` at coordinates (i, j) in matrix
-  /// `C`, is equal to `A_ij * B_ij`.
-  Self hadamardProduct(GenericMatrix B) {
-    _assertEqualDimensions(B);
-
-    var productValues = new List();
-
-    for (var i = 0; i < _values.length; i++) {
-      productValues.add(_values[i] * B._values[i]);
+  /// The LU-decomposition for the matrix (with partial pivoting).
+  PivotingLUDecomposition get luDecomposition {
+    if (_luDecompostion != null) {
+      return _luDecompostion;
     }
 
-    return copy(productValues);
+    _luDecompostion = new PivotingLUDecomposition(this);
+
+    return _luDecompostion;
   }
 
-  /// Divide the matrix by a scalar value.
+  /// The QR-decomposition for the matrix.
+  ReducedQRDecomposition get qrDecomposition {
+    if (_qrDecomposition != null) {
+      return _qrDecomposition;
+    }
+
+    _qrDecomposition = new ReducedQRDecomposition(this);
+
+    return _qrDecomposition;
+  }
+
+  /// Whether or not the matrix is non-singular (invertible).
+  bool get isNonSingular {
+    if (isSquare) {
+      return luDecomposition.isNonsingular;
+    } else {
+      return false;
+    }
+  }
+
+  /// The matrix's determinant.
   ///
-  /// Computes a new matrix `B` of this matrix `A` divided by a scalar s:
-  /// `A / s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
-  /// is equal to `A_ij / s`.
-  Self scalarDivision(num s) {
-    var dividedValues = new List.from(_values).map((v) => s / v);
+  /// Throws an [UnsupportedError] if the decomposed matrix is not square.
+  num get determinant => luDecomposition.determinant;
 
-    return copy(dividedValues.toList());
+  /// Solves `AX = B` for X, where A is this matrix and B the given matrix.
+  ///
+  /// Returns the solution if A is square, or the least squares solution
+  /// otherwise.
+  ///
+  /// Throws an [ArgumentError] if the row dimensions of A and B do not match.
+  /// Throws an [UnsupportedError] if A is square and singular.
+  /// Throws an [UnsupportedError] if A has more columns than rows.
+  GenericMatrix solve(GenericMatrix B) {
+    if (columnDimension > rowDimension) {
+      throw new UnsupportedError('Matrix has more columns than rows.');
+    }
+
+    if (isSquare) {
+      return luDecomposition.solve(B);
+    } else {
+      return qrDecomposition.solve(B);
+    }
   }
 
-  /// Returns the inverse matrix of the matrix.
-  Self get inverse {
+  /// Solves `XA = B` for X, where A is this matrix and B the given matrix.
+  ///
+  /// Solves `X * A = B` for X using `A' * X' = B'`. Returns the solution if A
+  /// is square, or the least squares solution otherwise.
+  ///
+  /// Throws an [ArgumentError] if the column dimensions of A and B do not
+  /// match.
+  /// Throws an [UnsupportedError] if A is square and singular.
+  /// Throws an [UnsupportedError] if A has more rows than columns.
+  GenericMatrix solveTranspose(GenericMatrix B) {
+    if (rowDimension > columnDimension) {
+      throw new UnsupportedError('Matrix has more rows than columns.');
+    }
+
+    return transpose.solve(B.transpose).transpose;
+  }
+
+  /// The matrix's inverse if the matrix is non-singular.
+  ///
+  /// Throws an [UnsupportedError] if the matrix is not square.
+  /// Throws an [UnsupportedError] if the matrix is square and singular.
+  Transpose get inverse {
     if (_inverse != null) {
       return _inverse;
     }
 
-    var numberList;
+    var values = luDecomposition.solve(new Matrix.identity(rowDimension)).values;
+
+    _inverse = transposeWithValues(values);
     
-    return copy(numberList);
+    return _inverse;
   }
 
   /// Computes the entrywise sum matrix with another matrix.
@@ -298,26 +443,74 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 ///
 /// Immutable matrix implementation without dimension specific optimisations or
 /// dimension restrictions.
+///
+///     var matrix = new Matrix([1, 2, 3,
+///                              4, 5, 6], 3);
+///
 class Matrix extends GenericMatrix<Matrix, Matrix> {
   Matrix(List<num> values, columnDimension)
       : super.fromList(values, columnDimension);
 
+  /// Creates a matrix from the given list with the given column dimension.
+  ///
+  /// Creates a matrix from the given list with the given column dimension. the
+  /// row dimension will be inferred from the list length. The list length must
+  /// be a multiple of the column dimension.
+  ///
+  /// Throws [ArgumentError] if the value list's length is not a multiple of the
+  /// column dimension.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 2 3
+  ///     // 4 5 6
+  ///     var matrix = new Matrix.fromList([1, 2, 3,
+  ///                                       4, 5, 6], 3);
+  ///
   Matrix.fromList(List<num> values, columnDimension)
       : super.fromList(values, columnDimension);
 
+  /// Creates a constant matrix of the specified value with the specified
+  /// dimensions.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 1 1
+  ///     // 1 1 1
+  ///     // 1 1 1
+  ///     var matrix = new Matrix.constant(1, 3, 3)
+  ///
   Matrix.constant(num value, int rowDimension, int columnDimension)
       : super.constant(value, rowDimension, columnDimension);
 
+  /// Creates a matrix of only zeros with the specified dimensions.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 0 0 0 0
+  ///     // 0 0 0 0
+  ///     // 0 0 0 0
+  ///     var matrix = new Matrix.zero(3, 4)
+  ///
   Matrix.zero(int rowDimension, int columnDimension)
       : super.zero(rowDimension, columnDimension);
 
+  /// Creates an identity matrix of the given size.
+  ///
+  /// Creates an square identity matrix (ones on the diagonal, zeros elsewhere)
+  /// of the specified size.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 0 0 0
+  ///     // 0 1 0 0
+  ///     // 0 0 1 0
+  ///     // 0 0 0 1
+  ///     var matrix = new Matrix.identity(4)
+  ///
   Matrix.identity(int size) : super.identity(size);
 
-  Matrix copy([List<num> newValues]) =>
-    new Matrix(newValues != null ? newValues : _values, columnDimension);
+  Matrix withValues(List<num> newValues) =>
+    new Matrix(newValues, columnDimension);
 
-  Matrix get transpose =>
-    new Matrix(valuesColumnPacked, rowDimension);
+  Matrix transposeWithValues(List<num> newValues) =>
+    new Matrix(newValues, rowDimension);
 }
 
 _identityValues(int size) {

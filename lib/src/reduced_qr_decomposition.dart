@@ -1,14 +1,14 @@
 part of matrix;
 
-/// The QR-decomposition of a matrix.
+/// The reduced QR-decomposition of a matrix.
 ///
 /// Decomposes an M x N matrix A, with M >= N, into an M x N orthogonal matrix Q
 /// and an N x N upper rectangular matrix R, such that `A = QR`.
 ///
-/// The primary use of the QR-decomposition is in the least squares solution of
-/// non-square systems of simultaneous linear equations. This will fail if the
-/// matrix is rank deficient.
-class QRDecomposition {
+/// The primary use of the reduced QR-decomposition is in the least squares
+/// solution of non-square systems of simultaneous linear equations. This will
+/// fail if the matrix is rank deficient.
+class ReducedQRDecomposition {
 
   /// The source matrix.
   ///
@@ -37,11 +37,15 @@ class QRDecomposition {
   GenericMatrix _orthogonalFactor;
 
   /// Creates a new QR-decomposition for the given matrix.
-  QRDecomposition(GenericMatrix matrix)
+  ReducedQRDecomposition(GenericMatrix matrix)
       : matrix = matrix,
         _QR = matrix.valuesRowPacked.toList(),
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension {
+
+    if (_cols > _rows) {
+      throw new ArgumentError('Reduced QR-decomposition is not supported for matrices with more columns than rows.');
+    }
 
     // Main loop.
     for (var k = 0; k < _cols; k++) {
@@ -101,7 +105,9 @@ class QRDecomposition {
   ///
   /// Lower trapezoidal matrix whose columns define the reflections.
   GenericMatrix get householderMatrix {
-    if(_householderMatrix != null) return _householderMatrix;
+    if (_householderMatrix != null) {
+      return _householderMatrix;
+    }
 
     var values = new List();
 
@@ -120,9 +126,11 @@ class QRDecomposition {
     return _householderMatrix;
   }
 
-  /// The upper triangular factor.
+  /// The upper triangular factor R.
   GenericMatrix get upperTriangularFactor {
-    if(_upperTriangularFactor != null) return _upperTriangularFactor;
+    if (_upperTriangularFactor != null) {
+      return _upperTriangularFactor;
+    }
 
     var values = new List();
 
@@ -143,9 +151,11 @@ class QRDecomposition {
     return _upperTriangularFactor;
   }
 
-  /// The orthogonal factor.
+  /// The orthogonal factor Q.
   GenericMatrix get orthogonalFactor {
-    if(_orthogonalFactor != null) return _orthogonalFactor;
+    if (_orthogonalFactor != null) {
+      return _orthogonalFactor;
+    }
 
     var values = new List.filled(_rows * _cols, 0);
 

@@ -1,7 +1,8 @@
-name: rl-matrix
+name: rl_matrix
 version: 0.0.1
 author: R.S. Schermer <roland0507@gmail.com>
-description: Utility library for linear algebra.
+description: Provides an immutable matrix implementation for Dart, based on Java's JAMA package.
+documentation:
 dependencies:
   collection: any
 dev_dependencies:

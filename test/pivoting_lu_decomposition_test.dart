@@ -237,8 +237,8 @@ void main() {
       test('throws error when the matrix is singular', () {
         var sourceMatrix = new Matrix([0, 0,
                                        0, 1], 2);
-        var targetMatrix = new Matrix([ 0,  1, 11,
-                                        2, -1, -5], 3);
+        var targetMatrix = new Matrix([0,  1, 11,
+                                       2, -1, -5], 3);
         var sourceLU = new PivotingLUDecomposition(sourceMatrix);
 
         expect(() => sourceLU.solve(targetMatrix), throwsUnsupportedError);
@@ -288,7 +288,6 @@ void main() {
         var targetMatrix = new Matrix([ 60, 45,
                                         49, 43,
                                        141, 92], 2);
-
         var sourceLU = new PivotingLUDecomposition(sourceMatrix);
         var solution = sourceLU.solve(targetMatrix);
         var product = sourceMatrix * solution;

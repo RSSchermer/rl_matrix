@@ -35,10 +35,10 @@ class PivotingLUDecomposition {
   /// A pivot vector of `(0, 2, 3, 1)` thus corresponds to the following pivot
   /// matrix:
   ///
-  ///   1 0 0 0
-  ///   0 0 1 0
-  ///   0 0 0 1
-  ///   0 1 0 0
+  ///     1 0 0 0
+  ///     0 0 1 0
+  ///     0 0 0 1
+  ///     0 1 0 0
   ///
   List<num> _piv;
 
