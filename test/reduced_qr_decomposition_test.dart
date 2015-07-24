@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:rl-matrix/matrix.dart';
+import 'package:rl_matrix/rl_matrix.dart';
 import 'helpers.dart';
 
 void main() {
