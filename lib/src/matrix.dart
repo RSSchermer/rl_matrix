@@ -448,6 +448,22 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 ///                              4, 5, 6], 3);
 ///
 class Matrix extends GenericMatrix<Matrix, Matrix> {
+
+  /// Creates a matrix from the given list with the given column dimension.
+  ///
+  /// Creates a matrix from the given list with the given column dimension. the
+  /// row dimension will be inferred from the list length. The list length must
+  /// be a multiple of the column dimension.
+  ///
+  /// Throws [ArgumentError] if the value list's length is not a multiple of the
+  /// column dimension.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     // 1 2 3
+  ///     // 4 5 6
+  ///     var matrix = new Matrix.fromList([1, 2, 3,
+  ///                                       4, 5, 6], 3);
+  ///
   Matrix(List<num> values, columnDimension)
       : super.fromList(values, columnDimension);
 
