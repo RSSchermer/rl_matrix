@@ -17,7 +17,7 @@ var product = matrix * transpose;
 ```
 
 For a complete overview of the operations available, have a look at the 
-[API documentation](http://www.dartdocs.org/documentation/rl_matrix/0.0.2/index.html#rl_matrix).
+[API documentation](http://www.dartdocs.org/documentation/rl_matrix/latest/index.html#rl_matrix).
 
 ## Dimension specific matrix classes
 
