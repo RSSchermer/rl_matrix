@@ -3,6 +3,8 @@
 Provides an immutable implementation for matrices of real numbers in Dart, based 
 on Java's [JAMA package](http://math.nist.gov/javanumerics/jama/). 
 
+[![Build Status](https://travis-ci.org/RSSchermer/rl_matrix.svg?branch=master)](https://travis-ci.org/RSSchermer/rl_matrix)
+
 ## Usage
 
 Example:
