@@ -26,7 +26,7 @@ Dart's type checker to enforce specific matrix dimensions, or to override
 certain algorithms with more effective dimension specific implementations.
 The abstract `GenericMatrix` class can be extended for this purpose. The 
 `GenericMatrix` class takes 2 type parameters: the extending class' type 
-(a self-bound) and the extending class' tranpose type. Also, two abstract 
+(a self-bound) and the extending class' transpose type. Also, two abstract 
 methods will need to be defined:
 
 - `withValues`: needs to return a new matrix of the same type and with the same 
