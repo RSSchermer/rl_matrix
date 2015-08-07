@@ -473,23 +473,53 @@ void main() {
           expect((m1 * m2).values, equals(e));
         });
       });
+    });
 
-      group('[] operator', () {
-        test('returns the correct row', () {
-          var matrix = new Matrix([1, 2, 3,
-                                   4, 5, 6,
-                                   7, 8, 9], 3);
+    group('[] operator', () {
+      test('returns the correct row', () {
+        var matrix = new Matrix([1, 2, 3,
+        4, 5, 6,
+        7, 8, 9], 3);
 
-          expect(matrix[1], equals([4, 5, 6]));
-        });
+        expect(matrix[1], equals([4, 5, 6]));
+      });
 
-        test('allows chaining with another [] operator to return a specific value', () {
-          var matrix = new Matrix([1, 2, 3,
-                                   4, 5, 6,
-                                   7, 8, 9], 3);
+      test('allows chaining with another [] operator to return a specific value', () {
+        var matrix = new Matrix([1, 2, 3,
+        4, 5, 6,
+        7, 8, 9], 3);
 
-          expect(matrix[1][2], equals(6));
-        });
+        expect(matrix[1][2], equals(6));
+      });
+    });
+
+    group('== operator', () {
+      test('returns false for matrices of differing dimensions', () {
+        var matrix1 = new Matrix([1, 2, 3,
+        4, 5, 6], 3);
+        var matrix2 = new Matrix([1, 2,
+        3, 4,
+        5, 6], 2);
+
+        expect(matrix1 == matrix2, equals(false));
+      });
+
+      test('returns false for matrices of equal dimensions with different values', () {
+        var matrix1 = new Matrix([1, 2, 3,
+        4, 5, 6], 3);
+        var matrix2 = new Matrix([1, 2, 3,
+        4, 5, 7], 3);
+
+        expect(matrix1 == matrix2, equals(false));
+      });
+
+      test('returns true for matrices of equal dimensions with the same values', () {
+        var matrix1 = new Matrix([1, 2, 3,
+        4, 5, 6], 3);
+        var matrix2 = new Matrix([1, 2, 3,
+        4, 5, 6], 3);
+
+        expect(matrix1 == matrix2, equals(true));
       });
     });
   });

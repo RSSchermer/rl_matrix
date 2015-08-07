@@ -1,5 +1,6 @@
 library matrix;
 
+import 'package:collection/equality.dart';
 import 'package:collection/wrappers.dart';
 import 'dart:math';
 

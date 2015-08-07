@@ -438,6 +438,13 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   List<num> operator [](row) =>
     _values.sublist(row * columnDimension, (row + 1) * columnDimension);
 
+  /// Checks if two matrices are equal.
+  ///
+  /// Equality for matrices is defined as equal dimensions and equal values. It
+  /// does not check matrix type.
+  bool operator ==(GenericMatrix matrix) =>
+    columnDimension == matrix.columnDimension && _iterableEquals(values, matrix.values);
+
   _assertEqualDimensions(GenericMatrix m) {
     if (m.columnDimension != columnDimension || m.rowDimension != rowDimension) {
       throw new ArgumentError('Can only compute an entrywise sum of matrices of equal dimensions.');
@@ -556,3 +563,5 @@ _identityValues(int size) {
 
   return values;
 }
+
+Function _iterableEquals = const ListEquality().equals;
