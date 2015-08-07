@@ -432,6 +432,12 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     }
   }
 
+  /// Returns a list containing the values in the specified row.
+  ///
+  /// Rows are zero-indexed, meaning 0 will return the first row.
+  List<num> operator [](row) =>
+    _values.sublist(row * columnDimension, (row + 1) * columnDimension);
+
   _assertEqualDimensions(GenericMatrix m) {
     if (m.columnDimension != columnDimension || m.rowDimension != rowDimension) {
       throw new ArgumentError('Can only compute an entrywise sum of matrices of equal dimensions.');

@@ -473,6 +473,24 @@ void main() {
           expect((m1 * m2).values, equals(e));
         });
       });
+
+      group('[] operator', () {
+        test('returns the correct row', () {
+          var matrix = new Matrix([1, 2, 3,
+                                   4, 5, 6,
+                                   7, 8, 9], 3);
+
+          expect(matrix[1], equals([4, 5, 6]));
+        });
+
+        test('allows chaining with another [] operator to return a specific value', () {
+          var matrix = new Matrix([1, 2, 3,
+                                   4, 5, 6,
+                                   7, 8, 9], 3);
+
+          expect(matrix[1][2], equals(6));
+        });
+      });
     });
   });
 }
