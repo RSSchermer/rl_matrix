@@ -1,4 +1,4 @@
-part of matrix;
+part of rl_matrix;
 
 /// Generic subclass for matrices and vectors.
 ///

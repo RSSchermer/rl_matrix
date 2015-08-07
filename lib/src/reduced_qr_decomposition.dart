@@ -1,4 +1,4 @@
-part of matrix;
+part of rl_matrix;
 
 /// The reduced QR-decomposition of a matrix.
 ///

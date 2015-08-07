@@ -1,4 +1,4 @@
-part of matrix;
+part of rl_matrix;
 
 /// The lower-upper factor decomposition of a matrix, with partial pivoting.
 ///
