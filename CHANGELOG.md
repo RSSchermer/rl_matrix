@@ -1,5 +1,20 @@
 # RL-matrix Change Log
 
+## 0.2.0
+
+BC break: the brackets operator `[]` implementation was removed from 
+`GenericMatrix` and added to `Matrix`. It's now up to a subclass of 
+`GenericMatrix` whether or not to implement the `[]` operator and to decide
+what the return type should be:
+
+```dart
+class ColumnVector extends GenericMatrix<ColumnVector, RowVector> {
+  ...
+
+  num operator [](int index) => valueAt(index, 0);
+}
+```
+
 ## 0.1.0
 
 Adds a brackets `[]` operator to matrices. This allows you to get the value at
