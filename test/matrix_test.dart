@@ -136,6 +136,24 @@ void main() {
       });
     });
 
+    group('rowAt', () {
+      test('throws an error when trying to access an out of bounds row', () {
+        var matrix = new Matrix([1, 2, 3,
+                                 4, 5, 6,
+                                 7, 8, 9], 3);
+
+        expect(() => matrix.rowAt(3), throwsRangeError);
+      });
+
+      test('returns the correct row', () {
+        var matrix = new Matrix([1, 2, 3,
+                                 4, 5, 6,
+                                 7, 8, 9], 3);
+
+        expect(matrix.rowAt(1), equals([4, 5, 6]));
+      });
+    });
+
     group('entrywiseSum', () {
       test('differing dimensions', () {
         var m1 = new Matrix([0, 1, 2,
@@ -476,6 +494,14 @@ void main() {
     });
 
     group('[] operator', () {
+      test('throws an error when trying to access an out of bounds row', () {
+        var matrix = new Matrix([1, 2, 3,
+                                 4, 5, 6,
+                                 7, 8, 9], 3);
+
+        expect(() => matrix[3], throwsRangeError);
+      });
+
       test('returns the correct row', () {
         var matrix = new Matrix([1, 2, 3,
                                  4, 5, 6,

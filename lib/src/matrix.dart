@@ -215,6 +215,19 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return new Matrix(subMatrixVals, colEnd - colStart + 1);
   }
 
+  /// Returns a list containing the values in the specified row.
+  ///
+  /// Rows are zero-indexed, meaning 0 will return the first row.
+  ///
+  /// Throws [RangeError] there is no row for the given row index.
+  List<num> rowAt(int row) {
+    if (row >= rowDimension) {
+      throw new RangeError.range(row, 0, rowDimension);
+    }
+
+    return _values.sublist(row * columnDimension, (row + 1) * columnDimension);
+  }
+
   /// Computes the entrywise sum matrix with another matrix.
   ///
   /// Computes the entrywise sum matrix `C` of the matrix `A` with another
@@ -432,12 +445,6 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     }
   }
 
-  /// Returns a list containing the values in the specified row.
-  ///
-  /// Rows are zero-indexed, meaning 0 will return the first row.
-  List<num> operator [](row) =>
-    _values.sublist(row * columnDimension, (row + 1) * columnDimension);
-
   /// Checks if two matrices are equal.
   ///
   /// Equality for matrices is defined as equal dimensions and equal values. It
@@ -540,6 +547,13 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
 
   Matrix transposeWithValues(List<num> newValues) =>
     new Matrix(newValues, rowDimension);
+
+  /// Returns a list containing the values in the specified row.
+  ///
+  /// Rows are zero-indexed, meaning 0 will return the first row.
+  ///
+  /// Throws [RangeError] there is no row for the given row index.
+  List<num> operator [](int row) => rowAt(row);
 }
 
 _identityValues(int size) {
