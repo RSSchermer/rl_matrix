@@ -1,5 +1,22 @@
 # RL-matrix Change Log
 
+## 0.3.0
+
+BC break: as of this version, the matrix implementation uses a `Float32List` for 
+value memory. This should constitute a significant performance boost, but also
+means that matrices now need to be instantiated with `double` values and can
+no longer be instantiated with `int` values:
+
+```dart
+var matrix = new Matrix([1, 2, 3,
+                         4, 5, 6], 3);
+
+// Needs to be replaced with:
+
+var matrix = new Matrix([1.0, 2.0, 3.0,
+                         4.0, 5.0, 6.0], 3);
+```
+
 ## 0.2.0
 
 BC break: the brackets operator `[]` implementation was removed from 
