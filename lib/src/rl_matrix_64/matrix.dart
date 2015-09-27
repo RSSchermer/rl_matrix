@@ -59,12 +59,6 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Memoized inverse matrix.
   Transpose _inverse;
 
-  /// Memoized left inverse matrix.
-  Transpose _leftInverse;
-
-  /// Memoized right inverse matrix.
-  Transpose _rightInverse;
-
   /// Creates a matrix from the given list with the given column dimension.
   ///
   /// Creates a matrix from the given list with the given column dimension. the
