@@ -10,11 +10,22 @@ on Java's [JAMA package](http://math.nist.gov/javanumerics/jama/).
 Example:
 
 ```dart
-var matrix = new Matrix([1, 2, 3,
-                         4, 5, 6], 3);
+// Instantiates the following matrix:
+//
+// 1.0 2.0 3.0
+// 4.0 5.0 6.0
+//
+var matrix = new Matrix([1.0, 2.0, 3.0,
+                         4.0, 5.0, 6.0], 3);
+
 var transpose = matrix.transpose;
 var product = matrix * transpose;
 ```
+
+Matrix instantiation currently takes 2 arguments: the first argument is a row
+major list of values and the second argument is the matrix's column dimension.
+Matrices need to be instantiated with double values, using integer values will
+result in an error.
 
 For a complete overview of the operations available, have a look at the 
 [API documentation](http://www.dartdocs.org/documentation/rl_matrix/latest/index.html#rl_matrix).
