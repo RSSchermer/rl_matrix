@@ -23,13 +23,16 @@ part of rl_matrix;
 /// The following example implements a column vector:
 ///
 ///     class ColumnVector extends GenericMatrix<ColumnVector, RowVector> {
-///       ColumnVector(List<num> values) : super.fromList(values, 1);
+///       ColumnVector(List<double> values) : super.fromList(values, 1);
 ///
-///       ColumnVector withValues(List<num> newValues) =>
-///         new ColumnVector(newValues);
+///       ColumnVector.fromFloat32List(Float32List values)
+///           : super.fromFloat32List(values, 1);
 ///
-///       RowVector transposeWithValues(List<num> newValues) =>
-///         new RowVector(newValues);
+///       ColumnVector withValues(Float32List newValues) =>
+///         new ColumnVector.fromFloat32List(newValues);
+///
+///       RowVector transposeWithValues(Float32List newValues) =>
+///         new RowVector.fromFloat32List(newValues);
 ///     }
 ///
 abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transpose extends GenericMatrix> {

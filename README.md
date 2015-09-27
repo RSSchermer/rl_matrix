@@ -49,12 +49,15 @@ The following example implements a column vector:
 
 ```dart
 class ColumnVector extends GenericMatrix<ColumnVector, RowVector> {
-  ColumnVector(List<num> values) : super.fromList(values, 1);
+  ColumnVector(List<double> values) : super.fromList(values, 1);
+  
+  ColumnVector.fromFloat32List(Float32List values)
+      : super.fromFloat32List(values, 1);
 
-  ColumnVector withValues(List<num> newValues) =>
-    new ColumnVector(newValues);
+  ColumnVector withValues(Float32List newValues) =>
+    new ColumnVector.fromFloat32List(newValues);
 
-  RowVector transposeWithValues(List<num> newValues) =>
-    new RowVector(newValues);
+  RowVector transposeWithValues(Float32List newValues) =>
+    new RowVector.fromFloat32List(newValues);
 }
 ```
