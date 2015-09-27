@@ -42,10 +42,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// The values that make up this matrix in row-packed format, meaning that
   /// for a matrix with a column dimension of 5, the first 5 values make up
   /// the first row, the second 5 values make up the second row, etc.
-  final UnmodifiableListView<num> _values;
+  final Float32List _values;
 
   /// Memoized column packed values.
-  UnmodifiableListView<num> _valuesColumnPacked;
+  UnmodifiableListView<double> _valuesColumnPacked;
 
   /// Memoized LU-decomposition.
   PivotingLUDecomposition _luDecompostion;
@@ -77,10 +77,32 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///     var matrix = new Matrix.fromList([1, 2, 3,
   ///                                       4, 5, 6], 3);
   ///
-  GenericMatrix.fromList(List<num> values, this.columnDimension)
-      : _values = new UnmodifiableListView(values) {
+  GenericMatrix.fromList(List<double> values, this.columnDimension)
+      : _values = new Float32List.fromList(values) {
     if (values.length % columnDimension != 0) {
-      throw new ArgumentError('The length of the values list (${values.length}) must be a multiple of the columnDimension (${columnDimension}) specified.');
+      throw new ArgumentError(
+          'The length of the values list (${values.length}) must be a ' +
+          'multiple of the columnDimension (${columnDimension}) specified.'
+      );
+    }
+  }
+
+  /// Creates a matrix from the given typed float32 list, with the given
+  /// column dimension.
+  ///
+  /// Creates a matrix from the given typed float32 list, with the given column
+  /// dimension. the row dimension will be inferred from the list length. The
+  /// list length must be a multiple of the column dimension.
+  ///
+  /// Throws [ArgumentError] if the value list's length is not a multiple of the
+  /// column dimension.
+  GenericMatrix.fromFloat32List(Float32List values, this.columnDimension)
+  : _values = values {
+    if (values.length % columnDimension != 0) {
+      throw new ArgumentError(
+          'The length of the values list (${values.length}) must be a ' +
+          'multiple of the columnDimension (${columnDimension}) specified.'
+      );
     }
   }
 
@@ -93,9 +115,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///     // 1 1 1
   ///     var matrix = new Matrix.constant(1, 3, 3)
   ///
-  GenericMatrix.constant(num value, int rowDimension, int columnDimension)
+  GenericMatrix.constant(double value, int rowDimension, int columnDimension)
       : columnDimension = columnDimension,
-        _values =  new UnmodifiableListView(new List.filled(columnDimension * rowDimension, value));
+        _values =  _constantValues(value, rowDimension, columnDimension);
 
   /// Creates a matrix of only zeros with the specified dimensions.
   ///
@@ -106,7 +128,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///     var matrix = new Matrix.zero(3, 4)
   ///
   GenericMatrix.zero(int rowDimension, int columnDimension)
-      : this.constant(0, rowDimension, columnDimension);
+      : columnDimension = columnDimension,
+        _values = new Float32List(rowDimension * columnDimension);
 
   /// Creates an identity matrix of the given size.
   ///
@@ -122,18 +145,19 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///
   GenericMatrix.identity(int size)
       : columnDimension = size,
-        _values = new UnmodifiableListView(_identityValues(size));
+        _values = _identityValues(size);
 
   /// Creates a new instance of this matrix type of equal dimensions, with the
   /// given values.
-  Self withValues(List<num> newValues);
+  Self withValues(Float32List newValues);
 
   /// Creates a new instance of this matrix's transpose type of transposed
   /// dimensions, with the given values.
-  Transpose transposeWithValues(List<num> newValues);
+  Transpose transposeWithValues(Float32List newValues);
 
   /// The transpose of the matrix.
-  Transpose get transpose => transposeWithValues(valuesColumnPacked);
+  Transpose get transpose =>
+    transposeWithValues(new Float32List.fromList(valuesColumnPacked));
 
   /// The row dimension of the matrix (number of rows).
   int get rowDimension => _values.length ~/ columnDimension;
@@ -148,7 +172,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// specifies the row and the second coordinate specifies the column. Row and
   /// column indices start at 0, so (0, 0) identifies the top left value in the
   /// matrix.
-  num valueAt(int row, int column) =>
+  double valueAt(int row, int column) =>
     _values[row * columnDimension + column];
 
   /// Returns the values in the matrix, column-packed.
@@ -156,16 +180,19 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// The values that make up this matrix in column-packed format, meaning that
   /// for a matrix with a row dimension of 5, the first 5 values make up the
   /// first column, the second 5 values make up the second column, etc.
-  Iterable<num> get valuesColumnPacked {
+  Iterable<double> get valuesColumnPacked {
     if (_valuesColumnPacked != null) {
       return _valuesColumnPacked;
     }
 
-    var values = new List();
+    var rows = rowDimension;
+    var values = new Float32List(columnDimension * rows);
         
     for (var column = 0; column < columnDimension; column++) {
+      var m = column * rows;
+
       for (var row = 0; row < rowDimension; row++) {
-        values.add(valueAt(row, column));
+        values[m + row] = _values[row * columnDimension + column];
       }
     }
 
@@ -179,10 +206,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// The values that make up this matrix and column-packed format, meaning that
   /// for a matrix with a column dimension of 5, the first 5 values make up the
   /// first row, the second 5 values make up the second row, etc.
-  Iterable<num> get valuesRowPacked => _values;
+  Iterable<double> get valuesRowPacked => new UnmodifiableListView(_values);
 
   /// Alias for `valuesRowPacked`
-  Iterable<num> get values => _values;
+  Iterable<double> get values => new UnmodifiableListView(_values);
 
   /// Returns a new sub-matrix.
   ///
@@ -197,30 +224,32 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// ending column index.
   GenericMatrix subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) {
     if (rowStart > rowEnd) {
-      throw new ArgumentError("Ending row index may not be bigger than starting row index.");
+      throw new ArgumentError('Ending row index may not be bigger than starting row index.');
     }
 
     if (colStart > colEnd) {
-      throw new ArgumentError("Ending column index may not be bigger than starting column index.");
+      throw new ArgumentError('Ending column index may not be bigger than starting column index.');
     }
 
-    var subMatrixVals = new List();
+    var rows = (rowEnd - rowStart) + 1;
+    var cols = (colEnd - colStart) + 1;
+    var subMatrixVals = new Float32List(rows * cols);
 
     for (var i = rowStart; i <= rowEnd; i++) {
       for (var j = colStart; j <= colEnd; j++) {
-        subMatrixVals.add(valueAt(i, j));
+        subMatrixVals[(i - rowStart) * cols + (j - colStart)] = valueAt(i, j);
       }
     }
 
-    return new Matrix(subMatrixVals, colEnd - colStart + 1);
+    return new Matrix(subMatrixVals, cols);
   }
 
   /// Returns a list containing the values in the specified row.
   ///
   /// Rows are zero-indexed, meaning 0 will return the first row.
   ///
-  /// Throws [RangeError] there is no row for the given row index.
-  List<num> rowAt(int row) {
+  /// Throws [RangeError] if there is no row for the given row index.
+  List<double> rowAt(int row) {
     if (row >= rowDimension) {
       throw new RangeError.range(row, 0, rowDimension);
     }
@@ -235,11 +264,12 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// matrix `C`, is equal to `A_ij + B_ij`.
   Self entrywiseSum(GenericMatrix B) {
     _assertEqualDimensions(B);
+
+    var length = columnDimension * rowDimension;
+    var summedValues = new Float32List(length);
     
-    var summedValues = new List();
-    
-    for (var i = 0; i < _values.length; i++) {
-      summedValues.add(_values[i] + B._values[i]);
+    for (var i = 0; i < length; i++) {
+      summedValues[i] = _values[i] + B._values[i];
     }
     
     return withValues(summedValues);
@@ -252,11 +282,12 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// (i, j) in matrix `C`, is equal to `A_ij - B_ij`.
   Self entrywiseDifference(GenericMatrix B) {
     _assertEqualDimensions(B);
+
+    var length = columnDimension * rowDimension;
+    var differenceValues = new Float32List(length);
     
-    var differenceValues = new List();
-    
-    for (var i = 0; i < _values.length; i++) {
-      differenceValues.add(_values[i] - B._values[i]);
+    for (var i = 0; i < length; i++) {
+      differenceValues[i] = _values[i] - B._values[i];
     }
 
     return withValues(differenceValues);
@@ -270,10 +301,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   Self entrywiseProduct(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var productValues = new List();
+    var length = columnDimension * rowDimension;
+    var productValues = new Float32List(length);
 
-    for (var i = 0; i < _values.length; i++) {
-      productValues.add(_values[i] * B._values[i]);
+    for (var i = 0; i < length; i++) {
+      productValues[i] = _values[i] * B._values[i];
     }
 
     return withValues(productValues);
@@ -285,9 +317,14 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// `A * s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
   /// is equal to `A_ij * s`.
   Self scalarProduct(num s) {
-    var multipliedValues = new List.from(_values).map((v) => s * v);
+    var length = _values.length;
+    var multipliedValues = new Float32List(length);
 
-    return withValues(multipliedValues.toList());
+    for (var i = 0; i < length; i++) {
+      multipliedValues[i] = _values[i] * s;
+    }
+
+    return withValues(multipliedValues);
   }
 
   /// Divide the matrix by a scalar value.
@@ -296,9 +333,14 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// `A / s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
   /// is equal to `A_ij / s`.
   Self scalarDivision(num s) {
-    var dividedValues = new List.from(_values).map((v) => s / v);
+    var length = _values.length;
+    var multipliedValues = new Float32List(length);
 
-    return withValues(dividedValues.toList());
+    for (var i = 0; i < length; i++) {
+      multipliedValues[i] = _values[i] / s;
+    }
+
+    return withValues(multipliedValues);
   }
 
   /// Computes the matrix product of the matrix with another matrix.
@@ -308,22 +350,28 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// row dimension of `B`.
   GenericMatrix matrixProduct(GenericMatrix B) {
     if (columnDimension != B.rowDimension) {
-      throw new ArgumentError("Matrix inner dimensions must agree.");
+      throw new ArgumentError('Matrix inner dimensions must agree.');
     }
 
-    var productValues = new List();
+    var rows = rowDimension;
     var bColumnPacked = B.valuesColumnPacked;
     var bCols = B.columnDimension;
+    var productValues = new Float32List(rows * bCols);
+    var counter = 0;
 
-    for (var row = 0; row < rowDimension; row++) {
+    for (var row = 0; row < rows; row++) {
+      var m = row * columnDimension;
+
       for (var col = 0; col < bCols; col++) {
-        var sum = 0;
+        var sum = 0.0;
+        var n = col * columnDimension;
 
         for (var j = 0; j < columnDimension; j++) {
-          sum += _values[row * columnDimension + j] * bColumnPacked[col * columnDimension + j];
+          sum += _values[m + j] * bColumnPacked[n + j];
         }
 
-        productValues.add(sum);
+        productValues[counter] = sum;
+        counter++;
       }
     }
 
@@ -364,7 +412,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// The matrix's determinant.
   ///
   /// Throws an [UnsupportedError] if the decomposed matrix is not square.
-  num get determinant => luDecomposition.determinant;
+  double get determinant => luDecomposition.determinant;
 
   /// Solves `AX = B` for X, where A is this matrix and B the given matrix.
   ///
@@ -414,7 +462,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
     var values = luDecomposition.solve(new Matrix.identity(rowDimension)).values;
 
-    _inverse = transposeWithValues(values);
+    _inverse = transposeWithValues(new Float32List.fromList(values));
     
     return _inverse;
   }
@@ -441,7 +489,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     } else if (a is GenericMatrix) {
       return matrixProduct(a);
     } else {
-      throw new ArgumentError("Expected num or GenericMatrix");
+      throw new ArgumentError('Expected num or GenericMatrix.');
     }
   }
 
@@ -481,10 +529,10 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///     // Instantiates the following matrix:
   ///     // 1 2 3
   ///     // 4 5 6
-  ///     var matrix = new Matrix.fromList([1, 2, 3,
-  ///                                       4, 5, 6], 3);
+  ///     var matrix = new Matrix([1, 2, 3,
+  ///                              4, 5, 6], 3);
   ///
-  Matrix(List<num> values, columnDimension)
+  Matrix(List<double> values, columnDimension)
       : super.fromList(values, columnDimension);
 
   /// Creates a matrix from the given list with the given column dimension.
@@ -502,8 +550,20 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///     var matrix = new Matrix.fromList([1, 2, 3,
   ///                                       4, 5, 6], 3);
   ///
-  Matrix.fromList(List<num> values, columnDimension)
+  Matrix.fromList(List<double> values, columnDimension)
       : super.fromList(values, columnDimension);
+
+  /// Creates a matrix from the given typed float32 list, with the given
+  /// column dimension.
+  ///
+  /// Creates a matrix from the given typed float32 list, with the given column
+  /// dimension. the row dimension will be inferred from the list length. The
+  /// list length must be a multiple of the column dimension.
+  ///
+  /// Throws [ArgumentError] if the value list's length is not a multiple of the
+  /// column dimension.
+  Matrix.fromFloat32List(Float32List values, columnDimension)
+      : super.fromFloat32List(values, columnDimension);
 
   /// Creates a constant matrix of the specified value with the specified
   /// dimensions.
@@ -514,7 +574,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///     // 1 1 1
   ///     var matrix = new Matrix.constant(1, 3, 3)
   ///
-  Matrix.constant(num value, int rowDimension, int columnDimension)
+  Matrix.constant(double value, int rowDimension, int columnDimension)
       : super.constant(value, rowDimension, columnDimension);
 
   /// Creates a matrix of only zeros with the specified dimensions.
@@ -542,37 +602,45 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///
   Matrix.identity(int size) : super.identity(size);
 
-  Matrix withValues(List<num> newValues) =>
-    new Matrix(newValues, columnDimension);
+  Matrix withValues(Float32List newValues) =>
+    new Matrix.fromFloat32List(newValues, columnDimension);
 
-  Matrix transposeWithValues(List<num> newValues) =>
-    new Matrix(newValues, rowDimension);
+  Matrix transposeWithValues(Float32List newValues) =>
+    new Matrix.fromFloat32List(newValues, rowDimension);
 
   /// Returns a list containing the values in the specified row.
   ///
   /// Rows are zero-indexed, meaning 0 will return the first row.
   ///
-  /// Throws [RangeError] there is no row for the given row index.
-  List<num> operator [](int row) => rowAt(row);
+  /// Throws [RangeError] if there is no row for the given row index.
+  List<double> operator [](int row) => rowAt(row);
+}
+
+_constantValues(double value, int rowDimension, int columnDimension) {
+  var length = columnDimension * rowDimension;
+  var values = new Float32List(length);
+
+  for (var i = 0; i < length; i++) {
+    values[i] = value;
+  }
+
+  return values;
 }
 
 _identityValues(int size) {
-  var values = new List();
-  var currentRow = 0, currentColumn = 0;
+  var values = new Float32List(size * size);
+  var counter = 0;
 
-  while (currentRow < size) {
-    while (currentColumn < size) {
-      if (currentRow == currentColumn) {
-        values.add(1);
+  for (var i = 0; i < size; i++) {
+    for (var j = 0; j < size; j++) {
+      if (i == j) {
+        values[counter] = 1.0;
       } else {
-        values.add(0);
+        values[counter] = 0.0;
       }
 
-      currentColumn++;
+      counter++;
     }
-
-    currentColumn = 0;
-    currentRow++;
   }
 
   return values;

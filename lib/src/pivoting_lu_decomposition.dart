@@ -24,7 +24,7 @@ class PivotingLUDecomposition {
   final GenericMatrix matrix;
 
   /// LU decomposition values.
-  List<num> _LU;
+  Float32List _LU;
 
   /// The pivot vector.
   ///
@@ -40,16 +40,16 @@ class PivotingLUDecomposition {
   ///     0 0 0 1
   ///     0 1 0 0
   ///
-  List<num> _piv;
+  List<int> _piv;
 
   /// The pivot sign.
   num _pivotSign = 1;
 
   /// The decomposed matrix's row dimension.
-  num _rows;
+  int _rows;
 
   /// The decomposed matrix's column dimension.
-  num _cols;
+  int _cols;
 
   /// Memoized lower factor.
   GenericMatrix _lowerFactor;
@@ -61,18 +61,19 @@ class PivotingLUDecomposition {
   GenericMatrix _pivotMatrix;
 
   /// Memoized determinant.
-  num _determinant;
+  double _determinant;
 
   /// Creates a new lower-upper factor decomposition for the given matrix.
   PivotingLUDecomposition(GenericMatrix matrix)
       : matrix = matrix,
-        _LU = matrix.valuesRowPacked.toList(),
+        _LU = new Float32List.fromList(matrix.values.toList()),
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
-        _piv = new List.generate(matrix.rowDimension, (i) => i) {
+        _piv = new List<int>.generate(matrix.rowDimension, (i) => i) {
 
     // Outer loop.
     for (var j = 0; j < _cols; j++) {
+      var m = j * _cols;
 
       // Find pivot
       var p = j;
@@ -86,9 +87,11 @@ class PivotingLUDecomposition {
       // Exchange pivot if necessary
       if (p != j) {
         for (var k = 0; k < _cols; k++) {
-          var t = _LU[p * _cols + k];
-          _LU[p * _cols + k] = _LU[j * _cols + k];
-          _LU[j * _cols + k] = t;
+          var n = p * _cols;
+
+          var t = _LU[n + k];
+          _LU[n + k] = _LU[m + k];
+          _LU[m + k] = t;
         }
 
         var k = _piv[p];
@@ -99,12 +102,14 @@ class PivotingLUDecomposition {
       }
 
       // Compute multipliers.
-      if (j < _rows && _LU[j * _cols + j] != 0) {
+      if (j < _rows && _LU[m + j] != 0.0) {
         for (var i = j + 1; i < _rows; i++) {
-          _LU[i * _cols + j] /= _LU[j * _cols + j];
+          var n = i * _cols;
+
+          _LU[n + j] /= _LU[m + j];
 
           for (var k = j + 1; k < _cols; k++) {
-            _LU[i * _cols + k] -= _LU[i * _cols + j] * _LU[j * _cols + k];
+            _LU[n + k] -= _LU[n + j] * _LU[m + k];
           }
         }
       }
@@ -118,11 +123,11 @@ class PivotingLUDecomposition {
   /// Throws an [UnsupportedError] if the decomposed matrix is not square.
   bool get isNonsingular {
     if (!matrix.isSquare) {
-      throw new UnsupportedError("Matrix is not square.");
+      throw new UnsupportedError('Matrix is not square.');
     }
 
     for (var j = 0; j < _cols; j++) {
-      if (_LU[j * _cols + j] == 0)
+      if (_LU[j * _cols + j] == 0.0)
         return false;
     }
 
@@ -137,21 +142,26 @@ class PivotingLUDecomposition {
       return _lowerFactor;
     }
 
-    var values = new List();
+    var values = new Float32List(_rows * _cols);
+    var counter = 0;
 
     for (var i = 0; i < _rows; i++) {
+      var m = i * _cols;
+
       for (var j = 0; j < _cols; j++) {
         if (i > j) {
-          values.add(_LU[i * _cols + j]);
+          values[counter] = _LU[m + j];
         } else if (i == j) {
-          values.add(1);
+          values[counter] = 1.0;
         } else {
-          values.add(0);
+          values[counter] = 0.0;
         }
+
+        counter++;
       }
     }
 
-    _lowerFactor = new Matrix(values, _cols);
+    _lowerFactor = new Matrix.fromFloat32List(values, _cols);
 
     return _lowerFactor;
   }
@@ -164,19 +174,24 @@ class PivotingLUDecomposition {
       return _upperFactor;
     }
 
-    var values = new List();
+    var values = new Float32List(_cols * _cols);
+    var counter = 0;
 
     for (var i = 0; i < _cols; i++) {
+      var m = i * _cols;
+
       for (int j = 0; j < _cols; j++) {
         if (i <= j) {
-          values.add(_LU[i * _cols + j]);
+          values[counter] = _LU[m + j];
         } else {
-          values.add(0);
+          values[counter] = 0.0;
         }
+
+        counter++;
       }
     }
 
-    _upperFactor = new Matrix(values, _cols);
+    _upperFactor = new Matrix.fromFloat32List(values, _cols);
 
     return _upperFactor;
   }
@@ -189,19 +204,22 @@ class PivotingLUDecomposition {
       return _pivotMatrix;
     }
 
-    var values = new List();
+    var values = new Float32List(_rows * _rows);
+    var counter = 0;
 
     for (var i = 0; i < _rows; i++) {
       for (var j = 0; j < _rows; j++) {
         if (j == _piv[i]) {
-          values.add(1);
+          values[counter] = 1.0;
         } else {
-          values.add(0);
+          values[counter] = 0.0;
         }
+
+        counter++;
       }
     }
 
-    _pivotMatrix = new Matrix(values, _rows);
+    _pivotMatrix = new Matrix.fromFloat32List(values, _rows);
 
     return _pivotMatrix;
   }
@@ -209,7 +227,7 @@ class PivotingLUDecomposition {
   /// The decomposed matrix's determinant.
   ///
   /// Throws an [UnsupportedError] if the decomposed matrix is not square.
-  num get determinant {
+  double get determinant {
     if (!matrix.isSquare) {
       throw new UnsupportedError('Matrix must be square.');
     }
@@ -218,7 +236,7 @@ class PivotingLUDecomposition {
       return _determinant;
     }
 
-    _determinant = _pivotSign;
+    _determinant = _pivotSign.toDouble();
 
     for (int j = 0; j < _cols; j++) {
       _determinant *= _LU[j * _cols + j];
@@ -242,39 +260,55 @@ class PivotingLUDecomposition {
       throw new UnsupportedError('Matrix is singular.');
     }
 
-    // Copy right hand side with pivoting
     var bVals = B.values.toList();
-    var xVals = new List();
     var xCols = B.columnDimension;
+    var xVals = new Float32List(_cols * xCols);
+
+    // Copy right hand side with pivoting
+    var counter = 0;
 
     _piv.forEach((row) {
+      var m = row * xCols;
+
       for (var i = 0; i < xCols; i++) {
-        xVals.add(bVals[row * xCols + i]);
+        xVals[counter] = bVals[m + i];
+        counter++;
       }
     });
 
     // Solve L*Y = B(piv,:)
     for (var k = 0; k < _cols; k++) {
+      var m = k * xCols;
+
       for (var i = k + 1; i < _cols; i++) {
+        var n = i * xCols;
+        var o = i * _cols;
+
         for (var j = 0; j < xCols; j++) {
-          xVals[i * xCols + j] -= xVals[k * xCols + j] * _LU[i * _cols + k];
+          xVals[n + j] -= xVals[m + j] * _LU[o + k];
         }
       }
     }
 
     // Solve U*X = Y;
     for (var k = _cols - 1; k >= 0; k--) {
+      var m = k * xCols;
+      var n = k * _cols;
+
       for (var j = 0; j < xCols; j++) {
-        xVals[k * xCols + j] /= _LU[k * _cols + k];
+        xVals[m + j] /= _LU[n + k];
       }
 
       for (var i = 0; i < k; i++) {
+        var o = i * xCols;
+        var p = i * _cols;
+
         for (var j = 0; j < xCols; j++) {
-          xVals[i * xCols + j] -= xVals[k * xCols + j] * _LU[i * _cols + k];
+          xVals[o + j] -= xVals[m + j] * _LU[p + k];
         }
       }
     }
 
-    return new Matrix(xVals, xCols);
+    return new Matrix.fromFloat32List(xVals, xCols);
   }
 }

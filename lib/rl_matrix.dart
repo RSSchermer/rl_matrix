@@ -11,6 +11,7 @@ library rl_matrix;
 import 'package:collection/equality.dart';
 import 'package:collection/wrappers.dart';
 import 'dart:math';
+import 'dart:typed_data';
 
 part 'src/matrix.dart';
 part 'src/pivoting_lu_decomposition.dart';
