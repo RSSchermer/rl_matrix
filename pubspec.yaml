@@ -7,4 +7,5 @@ documentation:
 dependencies:
   collection: '>=1.1.1 <2.0.0'
 dev_dependencies:
+  path: '>=1.0.0 <2.0.0'
   test: '>=0.10.0'
