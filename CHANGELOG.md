@@ -1,5 +1,9 @@
 # RL-matrix Change Log
 
+## 0.4.0
+
+Adds auto-generated implementation using `Float64List` for better precision.
+
 ## 0.3.0
 
 BC break: as of this version, the matrix implementation uses a `Float32List` for 
