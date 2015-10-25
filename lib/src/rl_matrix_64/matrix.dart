@@ -61,7 +61,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
   /// Creates a matrix from the given list with the given column dimension.
   ///
-  /// Creates a matrix from the given list with the given column dimension. the
+  /// Creates a matrix from the given list with the given column dimension. The
   /// row dimension will be inferred from the list length. The list length must
   /// be a multiple of the column dimension.
   ///
@@ -69,8 +69,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// column dimension.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 2.0 3.0
-  ///     // 4.0 5.0 6.0
+  ///     //
+  ///     //     1.0 2.0 3.0
+  ///     //     4.0 5.0 6.0
+  ///     //
   ///     var matrix = new Matrix.fromList([1.0, 2.0, 3.0,
   ///                                       4.0, 5.0, 6.0], 3);
   ///
@@ -78,17 +80,17 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
       : _values = new Float64List.fromList(values) {
     if (values.length % columnDimension != 0) {
       throw new ArgumentError(
-          'The length of the values list (${values.length}) must be a ' +
-          'multiple of the columnDimension (${columnDimension}) specified.'
+          'The length of the given values list (${values.length}) must be a ' +
+          'multiple of the specified columnDimension (${columnDimension}).'
       );
     }
   }
 
-  /// Creates a matrix from the given typed float32 list, with the given
+  /// Creates a matrix from the given typed float64 list, with the given
   /// column dimension.
   ///
-  /// Creates a matrix from the given typed float32 list, with the given column
-  /// dimension. the row dimension will be inferred from the list length. The
+  /// Creates a matrix from the given typed float64 list, with the given column
+  /// dimension. The row dimension will be inferred from the list length. The
   /// list length must be a multiple of the column dimension.
   ///
   /// Throws [ArgumentError] if the value list's length is not a multiple of the
@@ -97,8 +99,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   : _values = values {
     if (values.length % columnDimension != 0) {
       throw new ArgumentError(
-          'The length of the values list (${values.length}) must be a ' +
-          'multiple of the columnDimension (${columnDimension}) specified.'
+          'The length of the given values list (${values.length}) must be a ' +
+          'multiple of the specified columnDimension (${columnDimension}).'
       );
     }
   }
@@ -107,9 +109,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// dimensions.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 1.0 1.0
-  ///     // 1.0 1.0 1.0
-  ///     // 1.0 1.0 1.0
+  ///     //
+  ///     //     1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0
+  ///     //
   ///     var matrix = new Matrix.constant(1.0, 3, 3)
   ///
   GenericMatrix.constant(double value, int rowDimension, int columnDimension)
@@ -119,9 +123,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Creates a matrix of only zeros with the specified dimensions.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 0.0 0.0 0.0 0.0
-  ///     // 0.0 0.0 0.0 0.0
-  ///     // 0.0 0.0 0.0 0.0
+  ///     //
+  ///     //     0.0 0.0 0.0 0.0
+  ///     //     0.0 0.0 0.0 0.0
+  ///     //     0.0 0.0 0.0 0.0
+  ///     //
   ///     var matrix = new Matrix.zero(3, 4)
   ///
   GenericMatrix.zero(int rowDimension, int columnDimension)
@@ -134,10 +140,12 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// of the specified size.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 0.0 0.0 0.0
-  ///     // 0.0 1.0 0.0 0.0
-  ///     // 0.0 0.0 1.0 0.0
-  ///     // 0.0 0.0 0.0 1.0
+  ///     //
+  ///     //     1.0 0.0 0.0 0.0
+  ///     //     0.0 1.0 0.0 0.0
+  ///     //     0.0 0.0 1.0 0.0
+  ///     //     0.0 0.0 0.0 1.0
+  ///     //
   ///     var matrix = new Matrix.identity(4)
   ///
   GenericMatrix.identity(int size)
@@ -213,19 +221,24 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Takes 4 arguments: the starting row's index, the ending row's index, the
   /// starting column's index and the ending column's index. Indexes start at
   /// zero. The resulting sub-matrix will be the sub-section of the matrix
-  /// delineated by these indices. The given indices are inclusive, meaning that
-  /// a starting row index of 0 will include the first row in the sub-matrix.
+  /// delineated by these indices. The indices are inclusive, meaning that a
+  /// starting row index of 0 will include the first row in the sub-matrix and
+  /// an ending row index of 3 will include the fourth row in the sub-matrix.
   ///
   /// Throws an [ArgumentError] if the starting row index is greater than the
   /// ending row index, or the starting column index is greater than the
   /// ending column index.
   GenericMatrix subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) {
     if (rowStart > rowEnd) {
-      throw new ArgumentError('Ending row index may not be bigger than starting row index.');
+      throw new ArgumentError(
+          'Ending row index may not be bigger than starting row index.'
+      );
     }
 
     if (colStart > colEnd) {
-      throw new ArgumentError('Ending column index may not be bigger than starting column index.');
+      throw new ArgumentError(
+          'Ending column index may not be bigger than starting column index.'
+      );
     }
 
     var rows = (rowEnd - rowStart) + 1;
@@ -499,7 +512,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
   _assertEqualDimensions(GenericMatrix m) {
     if (m.columnDimension != columnDimension || m.rowDimension != rowDimension) {
-      throw new ArgumentError('Can only compute an entrywise sum of matrices of equal dimensions.');
+      throw new ArgumentError(
+          'Can only compute an entrywise sum of matrices of equal dimensions.'
+      );
     }
   }
 }
@@ -510,8 +525,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 /// dimension restrictions.
 ///
 ///     // Instantiates the following matrix:
-///     // 1.0 2.0 3.0
-///     // 4.0 5.0 6.0
+///     //
+///     //     1.0 2.0 3.0
+///     //     4.0 5.0 6.0
+///     //
 ///     var matrix = new Matrix([1.0, 2.0, 3.0,
 ///                              4.0, 5.0, 6.0], 3);
 ///
@@ -527,8 +544,10 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// column dimension.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 2.0 3.0
-  ///     // 4.0 5.0 6.0
+  ///     //
+  ///     //     1.0 2.0 3.0
+  ///     //     4.0 5.0 6.0
+  ///     //
   ///     var matrix = new Matrix([1.0, 2.0, 3.0,
   ///                              4.0, 5.0, 6.0], 3);
   ///
@@ -537,7 +556,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
 
   /// Creates a matrix from the given list with the given column dimension.
   ///
-  /// Creates a matrix from the given list with the given column dimension. the
+  /// Creates a matrix from the given list with the given column dimension. The
   /// row dimension will be inferred from the list length. The list length must
   /// be a multiple of the column dimension.
   ///
@@ -545,19 +564,21 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// column dimension.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 2.0 3.0
-  ///     // 4.0 5.0 6.0
+  ///     //
+  ///     //     1.0 2.0 3.0
+  ///     //     4.0 5.0 6.0
+  ///     //
   ///     var matrix = new Matrix.fromList([1.0, 2.0, 3.0,
   ///                                       4.0, 5.0, 6.0], 3);
   ///
   Matrix.fromList(List<double> values, columnDimension)
       : super.fromList(values, columnDimension);
 
-  /// Creates a matrix from the given typed float32 list, with the given
+  /// Creates a matrix from the given typed float64 list, with the given
   /// column dimension.
   ///
-  /// Creates a matrix from the given typed float32 list, with the given column
-  /// dimension. the row dimension will be inferred from the list length. The
+  /// Creates a matrix from the given typed float64 list, with the given column
+  /// dimension. The row dimension will be inferred from the list length. The
   /// list length must be a multiple of the column dimension.
   ///
   /// Throws [ArgumentError] if the value list's length is not a multiple of the
@@ -569,9 +590,11 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// dimensions.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 1.0 1.0
-  ///     // 1.0 1.0 1.0
-  ///     // 1.0 1.0 1.0
+  ///     //
+  ///     //     1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0
+  ///     //
   ///     var matrix = new Matrix.constant(1.0, 3, 3)
   ///
   Matrix.constant(double value, int rowDimension, int columnDimension)
@@ -580,9 +603,11 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// Creates a matrix of only zeros with the specified dimensions.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 0.0 0.0 0.0 0.0
-  ///     // 0.0 0.0 0.0 0.0
-  ///     // 0.0 0.0 0.0 0.0
+  ///     //
+  ///     //     0.0 0.0 0.0 0.0
+  ///     //     0.0 0.0 0.0 0.0
+  ///     //     0.0 0.0 0.0 0.0
+  ///     //
   ///     var matrix = new Matrix.zero(3, 4)
   ///
   Matrix.zero(int rowDimension, int columnDimension)
@@ -594,10 +619,12 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// of the specified size.
   ///
   ///     // Instantiates the following matrix:
-  ///     // 1.0 0.0 0.0 0.0
-  ///     // 0.0 1.0 0.0 0.0
-  ///     // 0.0 0.0 1.0 0.0
-  ///     // 0.0 0.0 0.0 1.0
+  ///     //
+  ///     //     1.0 0.0 0.0 0.0
+  ///     //     0.0 1.0 0.0 0.0
+  ///     //     0.0 0.0 1.0 0.0
+  ///     //     0.0 0.0 0.0 1.0
+  ///     //
   ///     var matrix = new Matrix.identity(4)
   ///
   Matrix.identity(int size) : super.identity(size);

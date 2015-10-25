@@ -44,13 +44,6 @@ class ReducedQRDecomposition {
         _cols = matrix.columnDimension,
         _Rdiag = new Float64List(matrix.columnDimension) {
 
-    if (_cols > _rows) {
-      throw new ArgumentError(
-          'Reduced QR-decomposition is not supported for matrices with more ' +
-          'columns than rows.'
-      );
-    }
-
     // Main loop.
     for (var k = 0; k < _cols; k++) {
       var m = k * _cols;

@@ -4,13 +4,6 @@ import 'helpers.dart';
 
 void main() {
   group('QR decomposition', () {
-    test('throws error when matrix is short (has more columns than rows)', () {
-      var matrix = new Matrix([1.0, 2.0, 3.0,
-                               4.0, 5.0, 6.0], 3);
-
-      expect(() => new ReducedQRDecomposition(matrix), throwsArgumentError);
-    });
-
     group('isFullRank', () {
       test('is true for full rank square matrix:\n  1 0 2\n  2 1 0\n  3 2 1', () {
         var matrix = new Matrix([1.0, 0.0, 2.0,
@@ -46,6 +39,14 @@ void main() {
         var matrix = new Matrix([1.0, 2.0,
                                  2.0, 4.0,
                                  3.0, 6.0], 2);
+        var QR = new ReducedQRDecomposition(matrix);
+
+        expect(QR.isFullRank, equals(false));
+      });
+
+      test('is false for short matrices (with more columns than rows)', () {
+        var matrix = new Matrix([1.0, 0.0, 2.0,
+                                 2.0, 1.0, 0.0], 3);
         var QR = new ReducedQRDecomposition(matrix);
 
         expect(QR.isFullRank, equals(false));
