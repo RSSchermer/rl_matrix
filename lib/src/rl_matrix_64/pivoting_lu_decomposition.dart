@@ -17,7 +17,6 @@ part of rl_matrix_64;
 /// square systems of simultaneous linear equations. This will fail if the
 /// matrix is non-singular. Pivoting reduces the impact of rounding errors.
 class PivotingLUDecomposition {
-
   /// The source matrix.
   ///
   /// The matrix for which this is the LU decomposition.
@@ -70,7 +69,6 @@ class PivotingLUDecomposition {
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
         _piv = new List<int>.generate(matrix.rowDimension, (i) => i) {
-
     // Outer loop.
     for (var j = 0; j < _cols; j++) {
       var m = j * _cols;
@@ -127,14 +125,13 @@ class PivotingLUDecomposition {
     }
 
     for (var j = 0; j < _cols; j++) {
-      if (_LU[j * _cols + j] == 0.0)
-        return false;
+      if (_LU[j * _cols + j] == 0.0) return false;
     }
 
     return true;
   }
 
-  /// The decomposition's lower factor.
+  /// This decomposition's lower factor.
   ///
   /// A matrix with all zero's above the diagonal.
   GenericMatrix get lowerFactor {
@@ -166,7 +163,7 @@ class PivotingLUDecomposition {
     return _lowerFactor;
   }
 
-  /// The decomposition's upper factor.
+  /// This decomposition's upper factor.
   ///
   /// A matrix with all zero's below the diagonal.
   GenericMatrix get upperFactor {
@@ -196,7 +193,7 @@ class PivotingLUDecomposition {
     return _upperFactor;
   }
 
-  /// The decomposition's pivot matrix.
+  /// This decomposition's pivot matrix.
   ///
   /// A permutation matrix.
   GenericMatrix get pivotMatrix {
@@ -251,7 +248,7 @@ class PivotingLUDecomposition {
   /// Throws an [ArgumentError] if the row dimensions of A and B do not match.
   /// Throws an [UnsupportedError] if A is singular.
   /// Throws an [UnsupportedError] if A is not square.
-  GenericMatrix solve (GenericMatrix B) {
+  GenericMatrix solve(GenericMatrix B) {
     if (B.rowDimension != _rows) {
       throw new ArgumentError('Matrix row dimensions must agree.');
     }
@@ -267,14 +264,14 @@ class PivotingLUDecomposition {
     // Copy right hand side with pivoting
     var counter = 0;
 
-    _piv.forEach((row) {
+    for (var row in _piv) {
       var m = row * xCols;
 
       for (var i = 0; i < xCols; i++) {
         xVals[counter] = bVals[m + i];
         counter++;
       }
-    });
+    }
 
     // Solve L*Y = B(piv,:)
     for (var k = 0; k < _cols; k++) {

@@ -1,6 +1,6 @@
 part of rl_matrix_64;
 
-/// Generic subclass for matrices and vectors.
+/// Generic superclass for matrices and vectors.
 ///
 /// Generic implementation for matrix operations. This implements an immutable
 /// matrix data structure, meaning that all operations will return a new matrix.
@@ -35,12 +35,12 @@ part of rl_matrix_64;
 ///         new RowVector.fromFloat64List(newValues);
 ///     }
 ///
-abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transpose extends GenericMatrix> {
-
-  /// The matrix's column dimension (number of columns)
+abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
+    Transpose extends GenericMatrix> {
+  /// This matrix's column dimension (number of columns)
   final int columnDimension;
 
-  /// The values in the matrix, row-packed.
+  /// The values in this matrix, row-packed.
   ///
   /// The values that make up this matrix in row-packed format, meaning that
   /// for a matrix with a column dimension of 5, the first 5 values make up
@@ -80,9 +80,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
       : _values = new Float64List.fromList(values) {
     if (values.length % columnDimension != 0) {
       throw new ArgumentError(
-          'The length of the given values list (${values.length}) must be a ' +
-          'multiple of the specified columnDimension (${columnDimension}).'
-      );
+          'The length of the given values list (${values.length}) must be a '
+          'multiple of the specified columnDimension (${columnDimension}).');
     }
   }
 
@@ -96,12 +95,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// Throws [ArgumentError] if the value list's length is not a multiple of the
   /// column dimension.
   GenericMatrix.fromFloat64List(Float64List values, this.columnDimension)
-  : _values = values {
+      : _values = values {
     if (values.length % columnDimension != 0) {
       throw new ArgumentError(
-          'The length of the given values list (${values.length}) must be a ' +
-          'multiple of the specified columnDimension (${columnDimension}).'
-      );
+          'The length of the given values list (${values.length}) must be a '
+          'multiple of the specified columnDimension (${columnDimension}).');
     }
   }
 
@@ -118,7 +116,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   ///
   GenericMatrix.constant(double value, int rowDimension, int columnDimension)
       : columnDimension = columnDimension,
-        _values =  _constantValues(value, rowDimension, columnDimension);
+        _values = _constantValues(value, rowDimension, columnDimension);
 
   /// Creates a matrix of only zeros with the specified dimensions.
   ///
@@ -162,9 +160,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
   /// The transpose of the matrix.
   Transpose get transpose =>
-    transposeWithValues(new Float64List.fromList(valuesColumnPacked));
+      transposeWithValues(new Float64List.fromList(valuesColumnPacked));
 
-  /// The row dimension of the matrix (number of rows).
+  /// The row dimension of this matrix (number of rows).
   int get rowDimension => _values.length ~/ columnDimension;
 
   /// Returns whether or not the matrix is square (row dimension equal to column
@@ -178,9 +176,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   /// column indices start at 0, so (0, 0) identifies the top left value in the
   /// matrix.
   double valueAt(int row, int column) =>
-    _values[row * columnDimension + column];
+      _values[row * columnDimension + column];
 
-  /// Returns the values in the matrix, column-packed.
+  /// Returns the values in this matrix, column-packed.
   ///
   /// The values that make up this matrix in column-packed format, meaning that
   /// for a matrix with a row dimension of 5, the first 5 values make up the
@@ -192,7 +190,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 
     var rows = rowDimension;
     var values = new Float64List(columnDimension * rows);
-        
+
     for (var column = 0; column < columnDimension; column++) {
       var m = column * rows;
 
@@ -206,7 +204,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return _valuesColumnPacked;
   }
 
-  /// Returns the values in the matrix, row-packed.
+  /// Returns the values in this matrix, row-packed.
   ///
   /// The values that make up this matrix and column-packed format, meaning that
   /// for a matrix with a column dimension of 5, the first 5 values make up the
@@ -231,14 +229,12 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
   GenericMatrix subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) {
     if (rowStart > rowEnd) {
       throw new ArgumentError(
-          'Ending row index may not be bigger than starting row index.'
-      );
+          'Ending row index may not be bigger than starting row index.');
     }
 
     if (colStart > colEnd) {
       throw new ArgumentError(
-          'Ending column index may not be bigger than starting column index.'
-      );
+          'Ending column index may not be bigger than starting column index.');
     }
 
     var rows = (rowEnd - rowStart) + 1;
@@ -267,35 +263,40 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return _values.sublist(row * columnDimension, (row + 1) * columnDimension);
   }
 
-  /// Computes the entrywise sum matrix with another matrix.
+  /// Computes the entrywise sum matrix of this matrix and another matrix.
   ///
-  /// Computes the entrywise sum matrix `C` of the matrix `A` with another
+  /// Computes the entrywise sum matrix `C` of this matrix `A` with another
   /// matrix `B`: `A + B = C`, where each value `C_ij` at coordinates (i, j) in
   /// matrix `C`, is equal to `A_ij + B_ij`.
+  ///
+  /// Throws an [ArgumentError] if the matrix dimensions don't match.
   Self entrywiseSum(GenericMatrix B) {
     _assertEqualDimensions(B);
 
     var length = columnDimension * rowDimension;
     var summedValues = new Float64List(length);
-    
+
     for (var i = 0; i < length; i++) {
       summedValues[i] = _values[i] + B._values[i];
     }
-    
+
     return withValues(summedValues);
   }
 
-  /// Computes the entrywise difference matrix with another matrix.
+  /// Computes the entrywise difference matrix of this matrix and another
+  /// matrix.
   ///
-  /// Computes the entrywise difference matrix `C` of the matrix `A` with
+  /// Computes the entrywise difference matrix `C` of this matrix `A` with
   /// another matrix `B`: `A - B = C`, where each value `C_ij` at coordinates
   /// (i, j) in matrix `C`, is equal to `A_ij - B_ij`.
+  ///
+  /// Throws an [ArgumentError] if the matrix dimensions don't match.
   Self entrywiseDifference(GenericMatrix B) {
     _assertEqualDimensions(B);
 
     var length = columnDimension * rowDimension;
     var differenceValues = new Float64List(length);
-    
+
     for (var i = 0; i < length; i++) {
       differenceValues[i] = _values[i] - B._values[i];
     }
@@ -303,11 +304,13 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return withValues(differenceValues);
   }
 
-  /// Computes the entrywise product of the matrix with another matrix.
+  /// Computes the entrywise product of this matrix and another matrix.
   ///
-  /// Computes the entrywise (Hadamard) product `C` of the matrix `A` with
+  /// Computes the entrywise (Hadamard) product `C` of this matrix `A` with
   /// another matrix `B`. Each value `C_ij` at coordinates (i, j) in matrix `C`,
   /// is equal to `A_ij * B_ij`.
+  ///
+  /// Throws an [ArgumentError] if the matrix dimensions don't match.
   Self entrywiseProduct(GenericMatrix B) {
     _assertEqualDimensions(B);
 
@@ -321,7 +324,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return withValues(productValues);
   }
 
-  /// Multiply the matrix with a scalar value.
+  /// Multiply this matrix with a scalar value.
   ///
   /// Computes a new matrix `B` of this matrix `A` multiplied with a scalar `s`:
   /// `A * s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
@@ -337,7 +340,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return withValues(multipliedValues);
   }
 
-  /// Divide the matrix by a scalar value.
+  /// Divide this matrix by a scalar value.
   ///
   /// Computes a new matrix `B` of this matrix `A` divided by a scalar s:
   /// `A / s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
@@ -353,11 +356,14 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return withValues(multipliedValues);
   }
 
-  /// Computes the matrix product of the matrix with another matrix.
+  /// Computes the matrix product of this matrix with another matrix.
   ///
   /// Computes the product matrix `C`, the matrix product of the matrix `A` with
   /// another matrix `B`: `AB = C`. The column dimension of `A` must match the
   /// row dimension of `B`.
+  ///
+  /// Throws an [ArgumentError] if matrix `A`'s column dimension does not equal
+  /// matrix `B`'s row dimension.
   GenericMatrix matrixProduct(GenericMatrix B) {
     if (columnDimension != B.rowDimension) {
       throw new ArgumentError('Matrix inner dimensions must agree.');
@@ -388,7 +394,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return new Matrix(productValues, B.columnDimension);
   }
 
-  /// The LU-decomposition for the matrix (with partial pivoting).
+  /// The LU-decomposition for this matrix (with partial pivoting).
   PivotingLUDecomposition get luDecomposition {
     if (_luDecompostion != null) {
       return _luDecompostion;
@@ -399,7 +405,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return _luDecompostion;
   }
 
-  /// The QR-decomposition for the matrix.
+  /// The QR-decomposition for this matrix.
   ReducedQRDecomposition get qrDecomposition {
     if (_qrDecomposition != null) {
       return _qrDecomposition;
@@ -410,7 +416,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return _qrDecomposition;
   }
 
-  /// Whether or not the matrix is non-singular (invertible).
+  /// Whether or not this matrix is non-singular (invertible).
   bool get isNonSingular {
     if (isSquare) {
       return luDecomposition.isNonsingular;
@@ -419,7 +425,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     }
   }
 
-  /// The matrix's determinant.
+  /// This matrix's determinant.
   ///
   /// Throws an [UnsupportedError] if the decomposed matrix is not square.
   double get determinant => luDecomposition.determinant;
@@ -461,7 +467,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     return transpose.solve(B.transpose).transpose;
   }
 
-  /// The matrix's inverse if the matrix is non-singular.
+  /// This matrix's inverse if this matrix is non-singular.
   ///
   /// Throws an [UnsupportedError] if the matrix is not square.
   /// Throws an [UnsupportedError] if the matrix is square and singular.
@@ -470,25 +476,31 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
       return _inverse;
     }
 
-    var values = luDecomposition.solve(new Matrix.identity(rowDimension)).values;
+    var values =
+        luDecomposition.solve(new Matrix.identity(rowDimension)).values;
 
     _inverse = transposeWithValues(new Float64List.fromList(values));
-    
+
     return _inverse;
   }
 
-  /// Computes the entrywise sum matrix with another matrix.
+  /// Computes the entrywise sum matrix of this matrix and another matrix.
   ///
   /// Computes the entrywise sum matrix `C` of the matrix `A` with another
   /// matrix `B`: `A + B = C`, where each value `C_ij` at coordinates (i, j) in
   /// matrix `C`, is equal to `A_ij + B_ij`.
+  ///
+  /// Throws an [ArgumentError] if the matrix dimensions don't match.
   Self operator +(GenericMatrix B) => entrywiseSum(B);
 
-  /// Computes the entrywise difference matrix with another matrix.
+  /// Computes the entrywise difference matrix of this matrix and another
+  /// matrix.
   ///
   /// Computes the entrywise difference matrix `C` of the matrix `A` with
   /// another matrix `B`: `A - B = C`, where each value `C_ij` at coordinates
   /// (i, j) in matrix `C`, is equal to `A_ij - B_ij`.
+  ///
+  /// Throws an [ArgumentError] if the matrix dimensions don't match.
   Self operator -(GenericMatrix B) => entrywiseDifference(B);
 
   /// Returns the scalar product for numerical values and the matrix product
@@ -503,18 +515,22 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
     }
   }
 
-  /// Checks if two matrices are equal.
+  /// Checks if this matrix is equal to another.
   ///
   /// Equality for matrices is defined as equal dimensions and equal values. It
   /// does not check matrix type.
   bool operator ==(GenericMatrix matrix) =>
-    columnDimension == matrix.columnDimension && _iterableEquals(values, matrix.values);
+      columnDimension == matrix.columnDimension &&
+          _iterableEquals(values, matrix.values);
+
+  int get hashCode =>
+    hash3(columnDimension, rowDimension, hashObjects(_values));
 
   _assertEqualDimensions(GenericMatrix m) {
-    if (m.columnDimension != columnDimension || m.rowDimension != rowDimension) {
+    if (m.columnDimension != columnDimension ||
+        m.rowDimension != rowDimension) {
       throw new ArgumentError(
-          'Can only compute an entrywise sum of matrices of equal dimensions.'
-      );
+          'Can only compute an entrywise sum of matrices of equal dimensions.');
     }
   }
 }
@@ -533,7 +549,6 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>, Transp
 ///                              4.0, 5.0, 6.0], 3);
 ///
 class Matrix extends GenericMatrix<Matrix, Matrix> {
-
   /// Creates a matrix from the given list with the given column dimension.
   ///
   /// Creates a matrix from the given list with the given column dimension. the
@@ -630,10 +645,10 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   Matrix.identity(int size) : super.identity(size);
 
   Matrix withValues(Float64List newValues) =>
-    new Matrix.fromFloat64List(newValues, columnDimension);
+      new Matrix.fromFloat64List(newValues, columnDimension);
 
   Matrix transposeWithValues(Float64List newValues) =>
-    new Matrix.fromFloat64List(newValues, rowDimension);
+      new Matrix.fromFloat64List(newValues, rowDimension);
 
   /// Returns a list containing the values in the specified row.
   ///

@@ -9,7 +9,6 @@ part of rl_matrix;
 /// solution of non-square systems of simultaneous linear equations. This will
 /// fail if the matrix is rank deficient.
 class ReducedQRDecomposition {
-
   /// The source matrix.
   ///
   /// The matrix for which this is the QR decomposition.
@@ -43,7 +42,6 @@ class ReducedQRDecomposition {
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
         _Rdiag = new Float32List(matrix.columnDimension) {
-
     // Main loop.
     for (var k = 0; k < _cols; k++) {
       var m = k * _cols;
@@ -56,7 +54,6 @@ class ReducedQRDecomposition {
       }
 
       if (nrm != 0.0) {
-
         // Form k-th Householder vector.
         if (_QR[m + k] < 0) {
           nrm = -nrm;
@@ -92,7 +89,7 @@ class ReducedQRDecomposition {
     }
   }
 
-  /// Whether or not the matrix is full rank.
+  /// Whether or not the decomposed matrix is full rank.
   bool get isFullRank {
     for (var j = 0; j < _cols; j++) {
       print(_Rdiag[j]);
@@ -104,7 +101,7 @@ class ReducedQRDecomposition {
     return true;
   }
 
-  /// The Householder matrix.
+  /// This decomposition's Householder matrix.
   ///
   /// Lower trapezoidal matrix whose columns define the reflections.
   GenericMatrix get householderMatrix {
@@ -134,7 +131,7 @@ class ReducedQRDecomposition {
     return _householderMatrix;
   }
 
-  /// The upper triangular factor R.
+  /// This decomposition's upper triangular factor R.
   GenericMatrix get upperTriangularFactor {
     if (_upperTriangularFactor != null) {
       return _upperTriangularFactor;
@@ -164,7 +161,7 @@ class ReducedQRDecomposition {
     return _upperTriangularFactor;
   }
 
-  /// The orthogonal factor Q.
+  /// This decomposition's orthogonal factor Q.
   GenericMatrix get orthogonalFactor {
     if (_orthogonalFactor != null) {
       return _orthogonalFactor;
@@ -271,6 +268,7 @@ class ReducedQRDecomposition {
       }
     }
 
-    return new Matrix.fromFloat32List(xVals, xCols).subMatrix(0, _cols - 1, 0, xCols - 1);
+    return new Matrix.fromFloat32List(xVals, xCols)
+        .subMatrix(0, _cols - 1, 0, xCols - 1);
   }
 }
