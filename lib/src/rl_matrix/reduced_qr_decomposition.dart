@@ -92,7 +92,6 @@ class ReducedQRDecomposition {
   /// Whether or not the decomposed matrix is full rank.
   bool get isFullRank {
     for (var j = 0; j < _cols; j++) {
-      print(_Rdiag[j]);
       if (_Rdiag[j].abs() < 0.00001) {
         return false;
       }
