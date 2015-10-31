@@ -116,7 +116,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   ///
   GenericMatrix.constant(double value, int rowDimension, int columnDimension)
       : columnDimension = columnDimension,
-        _values = _constantValues(value, rowDimension, columnDimension);
+        _values = new Float64List(rowDimension * columnDimension)
+          ..fillRange(0, rowDimension * columnDimension, value);
 
   /// Creates a matrix of only zeros with the specified dimensions.
   ///
@@ -189,7 +190,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
     }
 
     var rows = rowDimension;
-    var values = new Float64List(columnDimension * rows);
+    var values = new Float64List(_values.length);
 
     for (var column = 0; column < columnDimension; column++) {
       var m = column * rows;
@@ -255,12 +256,13 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// Rows are zero-indexed, meaning 0 will return the first row.
   ///
   /// Throws [RangeError] if there is no row for the given row index.
-  List<double> rowAt(int row) {
-    if (row >= rowDimension) {
-      throw new RangeError.range(row, 0, rowDimension);
+  List<double> rowAt(int index) {
+    if (index >= rowDimension) {
+      throw new RangeError.range(index, 0, rowDimension);
     }
 
-    return _values.sublist(row * columnDimension, (row + 1) * columnDimension);
+    return _values.sublist(
+        index * columnDimension, (index + 1) * columnDimension);
   }
 
   /// Computes the entrywise sum matrix of this matrix and another matrix.
@@ -273,7 +275,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   Self entrywiseSum(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var length = columnDimension * rowDimension;
+    var length = _values.length;
     var summedValues = new Float64List(length);
 
     for (var i = 0; i < length; i++) {
@@ -294,7 +296,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   Self entrywiseDifference(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var length = columnDimension * rowDimension;
+    var length = _values.length;
     var differenceValues = new Float64List(length);
 
     for (var i = 0; i < length; i++) {
@@ -314,7 +316,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   Self entrywiseProduct(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var length = columnDimension * rowDimension;
+    var length = _values.length;
     var productValues = new Float64List(length);
 
     for (var i = 0; i < length; i++) {
@@ -524,7 +526,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
           _iterableEquals(values, matrix.values);
 
   int get hashCode =>
-    hash3(columnDimension, rowDimension, hashObjects(_values));
+      hash3(columnDimension, rowDimension, hashObjects(_values));
 
   _assertEqualDimensions(GenericMatrix m) {
     if (m.columnDimension != columnDimension ||
@@ -656,17 +658,6 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///
   /// Throws [RangeError] if there is no row for the given row index.
   List<double> operator [](int row) => rowAt(row);
-}
-
-_constantValues(double value, int rowDimension, int columnDimension) {
-  var length = columnDimension * rowDimension;
-  var values = new Float64List(length);
-
-  for (var i = 0; i < length; i++) {
-    values[i] = value;
-  }
-
-  return values;
 }
 
 _identityValues(int size) {
