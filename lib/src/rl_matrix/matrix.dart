@@ -189,11 +189,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
       return _valuesColumnPacked;
     }
 
-    var rows = rowDimension;
-    var values = new Float32List(_values.length);
+    final rows = rowDimension;
+    final values = new Float32List(_values.length);
 
     for (var column = 0; column < columnDimension; column++) {
-      var m = column * rows;
+      final m = column * rows;
 
       for (var row = 0; row < rowDimension; row++) {
         values[m + row] = _values[row * columnDimension + column];
@@ -238,9 +238,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
           'Ending column index may not be bigger than starting column index.');
     }
 
-    var rows = (rowEnd - rowStart) + 1;
-    var cols = (colEnd - colStart) + 1;
-    var subMatrixVals = new Float32List(rows * cols);
+    final rows = (rowEnd - rowStart) + 1;
+    final cols = (colEnd - colStart) + 1;
+    final subMatrixVals = new Float32List(rows * cols);
 
     for (var i = rowStart; i <= rowEnd; i++) {
       for (var j = colStart; j <= colEnd; j++) {
@@ -275,8 +275,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   Self entrywiseSum(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var length = _values.length;
-    var summedValues = new Float32List(length);
+    final length = _values.length;
+    final summedValues = new Float32List(length);
 
     for (var i = 0; i < length; i++) {
       summedValues[i] = _values[i] + B._values[i];
@@ -296,8 +296,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   Self entrywiseDifference(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var length = _values.length;
-    var differenceValues = new Float32List(length);
+    final length = _values.length;
+    final differenceValues = new Float32List(length);
 
     for (var i = 0; i < length; i++) {
       differenceValues[i] = _values[i] - B._values[i];
@@ -316,8 +316,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   Self entrywiseProduct(GenericMatrix B) {
     _assertEqualDimensions(B);
 
-    var length = _values.length;
-    var productValues = new Float32List(length);
+    final length = _values.length;
+    final productValues = new Float32List(length);
 
     for (var i = 0; i < length; i++) {
       productValues[i] = _values[i] * B._values[i];
@@ -332,8 +332,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// `A * s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
   /// is equal to `A_ij * s`.
   Self scalarProduct(num s) {
-    var length = _values.length;
-    var multipliedValues = new Float32List(length);
+    final length = _values.length;
+    final multipliedValues = new Float32List(length);
 
     for (var i = 0; i < length; i++) {
       multipliedValues[i] = _values[i] * s;
@@ -348,8 +348,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// `A / s = B`, where each value `B_ij` at coordinates (i, j) in matrix `B`,
   /// is equal to `A_ij / s`.
   Self scalarDivision(num s) {
-    var length = _values.length;
-    var multipliedValues = new Float32List(length);
+    final length = _values.length;
+    final multipliedValues = new Float32List(length);
 
     for (var i = 0; i < length; i++) {
       multipliedValues[i] = _values[i] / s;
@@ -371,13 +371,13 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
       throw new ArgumentError('Matrix inner dimensions must agree.');
     }
 
-    var rows = rowDimension;
-    var bCols = B.columnDimension;
-    var productValues = new Float32List(rows * bCols);
+    final rows = rowDimension;
+    final bCols = B.columnDimension;
+    final productValues = new Float32List(rows * bCols);
     var counter = 0;
 
     for (var row = 0; row < rows; row++) {
-      var m = row * columnDimension;
+      final m = row * columnDimension;
 
       for (var col = 0; col < bCols; col++) {
         var sum = 0.0;
@@ -476,7 +476,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
       return _inverse;
     }
 
-    var values =
+    final values =
         luDecomposition.solve(new Matrix.identity(rowDimension)).values;
 
     _inverse = transposeWithValues(new Float32List.fromList(values));
@@ -659,7 +659,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
 }
 
 _identityValues(int size) {
-  var values = new Float32List(size * size);
+  final values = new Float32List(size * size);
   var counter = 0;
 
   for (var i = 0; i < size; i++) {
