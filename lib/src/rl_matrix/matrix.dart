@@ -372,7 +372,6 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
     }
 
     var rows = rowDimension;
-    var bColumnPacked = B.valuesColumnPacked;
     var bCols = B.columnDimension;
     var productValues = new Float32List(rows * bCols);
     var counter = 0;
@@ -382,10 +381,9 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
 
       for (var col = 0; col < bCols; col++) {
         var sum = 0.0;
-        var n = col * columnDimension;
 
         for (var j = 0; j < columnDimension; j++) {
-          sum += _values[m + j] * bColumnPacked[n + j];
+          sum += _values[m + j] * B._values[j * bCols + col];
         }
 
         productValues[counter] = sum;
