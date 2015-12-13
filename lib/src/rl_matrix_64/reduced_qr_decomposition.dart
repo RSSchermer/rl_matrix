@@ -44,7 +44,7 @@ class ReducedQRDecomposition {
         _Rdiag = new Float64List(matrix.columnDimension) {
     // Main loop.
     for (var k = 0; k < _cols; k++) {
-      var m = k * _cols;
+      final m = k * _cols;
 
       // Compute 2-norm of k-th column
       var nrm = 0.0;
@@ -78,7 +78,7 @@ class ReducedQRDecomposition {
           s = -s / _QR[m + k];
 
           for (var i = k; i < _rows; i++) {
-            var n = i * _cols;
+            final n = i * _cols;
 
             _QR[n + j] += s * _QR[n + k];
           }
@@ -108,11 +108,11 @@ class ReducedQRDecomposition {
       return _householderMatrix;
     }
 
-    var values = new Float64List(_rows * _cols);
+    final values = new Float64List(_rows * _cols);
     var counter = 0;
 
     for (var i = 0; i < _rows; i++) {
-      var m = i * _cols;
+      final m = i * _cols;
 
       for (var j = 0; j < _cols; j++) {
         if (i >= j) {
@@ -136,11 +136,11 @@ class ReducedQRDecomposition {
       return _upperTriangularFactor;
     }
 
-    var values = new Float64List(_cols * _cols);
+    final values = new Float64List(_cols * _cols);
     var counter = 0;
 
     for (var i = 0; i < _cols; i++) {
-      var m = i * _cols;
+      final m = i * _cols;
 
       for (var j = 0; j < _cols; j++) {
         if (i < j) {
@@ -166,14 +166,14 @@ class ReducedQRDecomposition {
       return _orthogonalFactor;
     }
 
-    var values = new Float64List(_rows * _cols);
+    final values = new Float64List(_rows * _cols);
 
     for (var i = 0; i < _rows * _cols; i++) {
       values[i] = 0.0;
     }
 
     for (var k = _cols - 1; k >= 0; k--) {
-      var m = k * _cols;
+      final m = k * _cols;
 
       for (var i = 0; i < _rows; i++) {
         values[i * _cols + k] = 0.0;
@@ -188,7 +188,7 @@ class ReducedQRDecomposition {
           var s = 0.0;
 
           for (var i = k; i < _rows; i++) {
-            var n = i * _cols;
+            final n = i * _cols;
 
             s += _QR[n + k] * values[n + j];
           }
@@ -196,7 +196,7 @@ class ReducedQRDecomposition {
           s = -s / _QR[m + k];
 
           for (var i = k; i < _rows; i++) {
-            var n = i * _cols;
+            final n = i * _cols;
 
             values[n + j] += s * _QR[n + k];
           }
@@ -224,18 +224,18 @@ class ReducedQRDecomposition {
     }
 
     // Copy right hand side
-    var xCols = B.columnDimension;
-    var xVals = new Float64List.fromList(B.values);
+    final xCols = B.columnDimension;
+    final xVals = new Float64List.fromList(B.values);
 
     // Compute Y = transpose(Q)*B
     for (var k = 0; k < _cols; k++) {
-      var m = k * _cols;
+      final m = k * _cols;
 
       for (var j = 0; j < xCols; j++) {
         var s = 0;
 
         for (var i = k; i < _rows; i++) {
-          var n = i * _cols;
+          final n = i * _cols;
 
           s += _QR[n + k] * xVals[n + j];
         }
@@ -243,7 +243,7 @@ class ReducedQRDecomposition {
         s = -s / _QR[m + k];
 
         for (var i = k; i < _rows; i++) {
-          var n = i * _cols;
+          final n = i * _cols;
 
           xVals[n + j] += s * _QR[n + k];
         }
@@ -252,14 +252,14 @@ class ReducedQRDecomposition {
 
     // Solve R*X = Y;
     for (var k = _cols - 1; k >= 0; k--) {
-      var m = k * _cols;
+      final m = k * _cols;
 
       for (var j = 0; j < xCols; j++) {
         xVals[m + j] /= _Rdiag[k];
       }
 
       for (var i = 0; i < k; i++) {
-        var n = i * _cols;
+        final n = i * _cols;
 
         for (var j = 0; j < xCols; j++) {
           xVals[n + j] -= xVals[m + j] * _QR[n + k];

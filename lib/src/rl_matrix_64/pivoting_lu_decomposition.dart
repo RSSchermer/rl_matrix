@@ -71,7 +71,7 @@ class PivotingLUDecomposition {
         _piv = new List<int>.generate(matrix.rowDimension, (i) => i) {
     // Outer loop.
     for (var j = 0; j < _cols; j++) {
-      var m = j * _cols;
+      final m = j * _cols;
 
       // Find pivot
       var p = j;
@@ -85,14 +85,14 @@ class PivotingLUDecomposition {
       // Exchange pivot if necessary
       if (p != j) {
         for (var k = 0; k < _cols; k++) {
-          var n = p * _cols;
+          final n = p * _cols;
 
-          var t = _LU[n + k];
+          final t = _LU[n + k];
           _LU[n + k] = _LU[m + k];
           _LU[m + k] = t;
         }
 
-        var k = _piv[p];
+        final k = _piv[p];
         _piv[p] = _piv[j];
         _piv[j] = k;
 
@@ -102,7 +102,7 @@ class PivotingLUDecomposition {
       // Compute multipliers.
       if (j < _rows && _LU[m + j] != 0.0) {
         for (var i = j + 1; i < _rows; i++) {
-          var n = i * _cols;
+          final n = i * _cols;
 
           _LU[n + j] /= _LU[m + j];
 
@@ -139,11 +139,11 @@ class PivotingLUDecomposition {
       return _lowerFactor;
     }
 
-    var values = new Float64List(_rows * _cols);
+    final values = new Float64List(_rows * _cols);
     var counter = 0;
 
     for (var i = 0; i < _rows; i++) {
-      var m = i * _cols;
+      final m = i * _cols;
 
       for (var j = 0; j < _cols; j++) {
         if (i > j) {
@@ -171,11 +171,11 @@ class PivotingLUDecomposition {
       return _upperFactor;
     }
 
-    var values = new Float64List(_cols * _cols);
+    final values = new Float64List(_cols * _cols);
     var counter = 0;
 
     for (var i = 0; i < _cols; i++) {
-      var m = i * _cols;
+      final m = i * _cols;
 
       for (int j = 0; j < _cols; j++) {
         if (i <= j) {
@@ -201,7 +201,7 @@ class PivotingLUDecomposition {
       return _pivotMatrix;
     }
 
-    var values = new Float64List(_rows * _rows);
+    final values = new Float64List(_rows * _rows);
     var counter = 0;
 
     for (var i = 0; i < _rows; i++) {
@@ -257,15 +257,15 @@ class PivotingLUDecomposition {
       throw new UnsupportedError('Matrix is singular.');
     }
 
-    var bVals = B.values.toList();
-    var xCols = B.columnDimension;
-    var xVals = new Float64List(_cols * xCols);
+    final bVals = B.values.toList();
+    final xCols = B.columnDimension;
+    final xVals = new Float64List(_cols * xCols);
 
     // Copy right hand side with pivoting
     var counter = 0;
 
     for (var row in _piv) {
-      var m = row * xCols;
+      final m = row * xCols;
 
       for (var i = 0; i < xCols; i++) {
         xVals[counter] = bVals[m + i];
@@ -275,11 +275,11 @@ class PivotingLUDecomposition {
 
     // Solve L*Y = B(piv,:)
     for (var k = 0; k < _cols; k++) {
-      var m = k * xCols;
+      final m = k * xCols;
 
       for (var i = k + 1; i < _cols; i++) {
-        var n = i * xCols;
-        var o = i * _cols;
+        final n = i * xCols;
+        final o = i * _cols;
 
         for (var j = 0; j < xCols; j++) {
           xVals[n + j] -= xVals[m + j] * _LU[o + k];
@@ -289,16 +289,16 @@ class PivotingLUDecomposition {
 
     // Solve U*X = Y;
     for (var k = _cols - 1; k >= 0; k--) {
-      var m = k * xCols;
-      var n = k * _cols;
+      final m = k * xCols;
+      final n = k * _cols;
 
       for (var j = 0; j < xCols; j++) {
         xVals[m + j] /= _LU[n + k];
       }
 
       for (var i = 0; i < k; i++) {
-        var o = i * xCols;
-        var p = i * _cols;
+        final o = i * xCols;
+        final p = i * _cols;
 
         for (var j = 0; j < xCols; j++) {
           xVals[o + j] -= xVals[m + j] * _LU[p + k];
