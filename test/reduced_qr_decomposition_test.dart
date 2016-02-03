@@ -11,7 +11,7 @@ void main() {
                                  3.0, 2.0, 1.0], 3);
         var QR = new ReducedQRDecomposition(matrix);
 
-        expect(QR.isFullRank, equals(true));
+        expect(QR.isFullRank, isTrue);
       });
 
       test('is true for full rank tall matrix:\n   2  5 3\n   4  6 6\n  11  3 2\n   4 -7 9', () {
@@ -21,7 +21,7 @@ void main() {
                                   4.0, -7.0, 9.0], 3);
         var QR = new ReducedQRDecomposition(matrix);
 
-        expect(QR.isFullRank, equals(true));
+        expect(QR.isFullRank, isTrue);
       });
 
       test('is false for rank deficient square matrix:\n  1 0 1\n  2 1 3\n  3 2 5', () {
@@ -31,7 +31,7 @@ void main() {
                                  3.0, 2.0, 5.0], 3);
         var QR = new ReducedQRDecomposition(matrix);
 
-        expect(QR.isFullRank, equals(false));
+        expect(QR.isFullRank, isFalse);
       });
 
       test('is false for rank deficient tall matrix:\n  1 2 \n  2 4\n  3 6', () {
@@ -41,7 +41,7 @@ void main() {
                                  3.0, 6.0], 2);
         var QR = new ReducedQRDecomposition(matrix);
 
-        expect(QR.isFullRank, equals(false));
+        expect(QR.isFullRank, isFalse);
       });
 
       test('is false for short matrices (with more columns than rows)', () {
@@ -49,7 +49,7 @@ void main() {
                                  2.0, 1.0, 0.0], 3);
         var QR = new ReducedQRDecomposition(matrix);
 
-        expect(QR.isFullRank, equals(false));
+        expect(QR.isFullRank, isFalse);
       });
     });
 
@@ -81,7 +81,7 @@ void main() {
         var QR = new ReducedQRDecomposition(sourceMatrix);
         var product = QR.orthogonalFactor * QR.upperTriangularFactor;
 
-        expect(product.values, pairWiseDifferenceLessThan(sourceMatrix.values, 0.00001));
+        expect(product.values, orderedCloseTo(sourceMatrix.values, 0.00001));
       });
     });
 
@@ -118,7 +118,7 @@ void main() {
         var QR = new ReducedQRDecomposition(matrix);
         var solution = QR.solve(matrix);
 
-        expect(solution.values, pairWiseDifferenceLessThan(new Matrix.identity(2).values.toList(), 0.00001));
+        expect(solution.values, orderedCloseTo(new Matrix.identity(2).values, 0.00001));
         expect(solution.columnDimension, equals(2));
       });
 
@@ -133,7 +133,7 @@ void main() {
         var solution = sourceQR.solve(targetMatrix);
         var product = sourceMatrix * solution;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values, 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
     });
   });

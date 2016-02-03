@@ -15,7 +15,7 @@ void main() {
         var e = [6.0, 6.0, 6.0,
                  6.0, 6.0, 6.0];
 
-        expect(m.values.toList(), equals(e));
+        expect(m.values, orderedCloseTo(e, 0.00001));
       });
 
       test('zero matrix', () {
@@ -24,7 +24,7 @@ void main() {
                  0.0, 0.0, 0.0,
                  0.0, 0.0, 0.0];
 
-        expect(m.values.toList(), equals(e));
+        expect(m.values, orderedCloseTo(e, 0.00001));
       });
 
       test('identity matrix', () {
@@ -33,7 +33,7 @@ void main() {
                  0.0, 1.0, 0.0,
                  0.0, 0.0, 1.0];
 
-        expect(m.values.toList(), equals(e));
+        expect(m.values, orderedCloseTo(e, 0.00001));
       });
     });
 
@@ -63,7 +63,7 @@ void main() {
       var m = new Matrix([0.0, 1.0, 2.0,
                           3.0, 4.0, 5.0], 3);
 
-      expect(m.values.toList(), equals([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]));
+      expect(m.values, orderedCloseTo([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], 0.00001));
     });
 
     group('valueAt', () {
@@ -71,19 +71,19 @@ void main() {
                           3.0, 4.0, 5.0], 3);
 
       test('(0, 0)', () {
-        expect(m.valueAt(0, 0), equals(0.0));
+        expect(m.valueAt(0, 0), closeTo(0.0, 0.00001));
       });
 
       test('(0, 2)', () {
-        expect(m.valueAt(0, 2), equals(2.0));
+        expect(m.valueAt(0, 2), closeTo(2.0, 0.00001));
       });
 
       test('(1, 0)', () {
-        expect(m.valueAt(1, 0), equals(3.0));
+        expect(m.valueAt(1, 0), closeTo(3.0, 0.00001));
       });
 
       test('(1, 2)', () {
-        expect(m.valueAt(1, 2), equals(5.0));
+        expect(m.valueAt(1, 2), closeTo(5.0, 0.00001));
       });
     });
 
@@ -92,7 +92,7 @@ void main() {
                           1.0, 2.0, 3.0,
                           1.0, 2.0, 3.0], 3);
 
-      expect(m.valuesColumnPacked.toList(), equals([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0]));
+      expect(m.valuesColumnPacked, orderedCloseTo([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0], 0.00001));
     });
 
     test('valuesRowPacked', () {
@@ -100,7 +100,7 @@ void main() {
                           1.0, 2.0, 3.0,
                           1.0, 2.0, 3.0], 3);
 
-      expect(m.valuesRowPacked.toList(), equals([1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0]));
+      expect(m.valuesRowPacked, orderedCloseTo([1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0], 0.00001));
     });
 
     group('subMatrix', () {
@@ -127,7 +127,7 @@ void main() {
         var subMatrix = m.subMatrix(1, 2, 1, 2);
 
         test('with the expected values', () {
-          expect(subMatrix.values.toList(), equals([5.0, 6.0, 8.0, 9.0]));
+          expect(subMatrix.values, orderedCloseTo([5.0, 6.0, 8.0, 9.0], 0.00001));
         });
 
         test('with the expected column dimensions', () {
@@ -150,7 +150,7 @@ void main() {
                                  4.0, 5.0, 6.0,
                                  7.0, 8.0, 9.0], 3);
 
-        expect(matrix.rowAt(1), equals([4.0, 5.0, 6.0]));
+        expect(matrix.rowAt(1), orderedCloseTo([4.0, 5.0, 6.0], 0.00001));
       });
     });
 
@@ -176,7 +176,7 @@ void main() {
                  8.0, 8.0, 8.0,
                  8.0, 8.0, 8.0];
 
-        expect(m1.entrywiseSum(m2).values.toList(), equals(e));
+        expect(m1.entrywiseSum(m2).values, orderedCloseTo(e, 0.00001));
       });
     });
 
@@ -202,7 +202,7 @@ void main() {
                  0.0, 0.0, 0.0,
                  0.0, 0.0, 0.0];
 
-        expect(m1.entrywiseDifference(m2).values.toList(), equals(e));
+        expect(m1.entrywiseDifference(m2).values, orderedCloseTo(e, 0.00001));
       });
     });
 
@@ -214,7 +214,7 @@ void main() {
                3.0, 3.0, 3.0,
                3.0, 3.0, 3.0];
 
-      expect(m.scalarProduct(3).values.toList(), equals(e));
+      expect(m.scalarProduct(3).values, orderedCloseTo(e, 0.00001));
     });
 
     group('matrixProduct', () {
@@ -235,7 +235,7 @@ void main() {
                  4.0, 5.0, 6.0];
 
         expect(m1.matrixProduct(m2).columnDimension, equals(3));
-        expect(m1.matrixProduct(m2).values.toList(), equals(e));
+        expect(m1.matrixProduct(m2).values, orderedCloseTo(e, 0.00001));
       });
 
       test('valid dimensions', () {
@@ -251,7 +251,7 @@ void main() {
                  -1.0,  0.0, -3.0];
 
         expect(m1.matrixProduct(m2).columnDimension, equals(3));
-        expect(m1.matrixProduct(m2).values.toList(), equals(e));
+        expect(m1.matrixProduct(m2).values, orderedCloseTo(e, 0.00001));
       });
     });
 
@@ -263,7 +263,7 @@ void main() {
                2.0, 5.0];
 
       expect(m.transpose.columnDimension, equals(2));
-      expect(m.transpose.values.toList(), equals(e));
+      expect(m.transpose.values, orderedCloseTo(e, 0.00001));
     });
 
     group('solve', () {
@@ -303,7 +303,7 @@ void main() {
                                  2.0,  8.0, 7.0], 3);
         var solution = matrix.solve(matrix);
 
-        expect(solution.values, pairWiseDifferenceLessThan(new Matrix.identity(3).values.toList(), 0.00001));
+        expect(solution.values, orderedCloseTo(new Matrix.identity(3).values, 0.00001));
         expect(solution.columnDimension, equals(3));
       });
 
@@ -315,7 +315,7 @@ void main() {
         var solution = sourceMatrix.solve(targetMatrix);
         var product = sourceMatrix * solution;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
 
       test('verify `AX = B`, for the solution X and matrix A:\n  6 3 0\n  2 5 1\n  9 8 6\n And matrix B:\n   60 45\n   49 43\n  141 92', () {
@@ -328,7 +328,7 @@ void main() {
         var solution = sourceMatrix.solve(targetMatrix);
         var product = sourceMatrix * solution;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
 
       test('verify `AX = B`, for the solution X and matrix A:\n  4 0\n  0 2\n  1 6\n And matrix B:\n  92 40\n  18  8\n  59 26', () {
@@ -341,7 +341,7 @@ void main() {
         var solution = sourceMatrix.solve(targetMatrix);
         var product = sourceMatrix * solution;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
     });
 
@@ -366,7 +366,7 @@ void main() {
         var solution = sourceMatrix.solveTranspose(targetMatrix);
         var product = solution * sourceMatrix;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
     });
 
@@ -396,7 +396,7 @@ void main() {
         });
 
         test('with the right values', () {
-          expect(inverse.values.toList(), equals([0.5, 0.0, 0.0, -0.5, -1.0, 0.5, -0.25, 0.5, 0.0]));
+          expect(inverse.values, orderedCloseTo([0.5, 0.0, 0.0, -0.5, -1.0, 0.5, -0.25, 0.5, 0.0], 0.00001));
         });
       });
     });
@@ -423,7 +423,7 @@ void main() {
                  8.0, 8.0, 8.0,
                  8.0, 8.0, 8.0];
 
-        expect((m1 + m2).values.toList(), equals(e));
+        expect((m1 + m2).values, orderedCloseTo(e, 0.00001));
       });
     });
 
@@ -449,7 +449,7 @@ void main() {
                  0.0, 0.0, 0.0,
                  0.0, 0.0, 0.0];
 
-        expect((m1 - m2).values.toList(), equals(e));
+        expect((m1 - m2).values, orderedCloseTo(e, 0.00001));
       });
     });
 
@@ -462,7 +462,7 @@ void main() {
                  3.0, 3.0, 3.0,
                  3.0, 3.0, 3.0];
 
-        expect((m * 3).values.toList(), equals(e));
+        expect((m * 3).values, orderedCloseTo(e, 0.00001));
       });
 
       group('with a matrix value', () {
@@ -488,7 +488,7 @@ void main() {
                    -1.0,  0.0, -3.0];
 
           expect((m1 * m2).columnDimension, equals(3));
-          expect((m1 * m2).values, equals(e));
+          expect((m1 * m2).values, orderedCloseTo(e, 0.00001));
         });
       });
     });
@@ -507,7 +507,7 @@ void main() {
                                  4.0, 5.0, 6.0,
                                  7.0, 8.0, 9.0], 3);
 
-        expect(matrix[1], equals([4.0, 5.0, 6.0]));
+        expect(matrix[1], orderedCloseTo([4.0, 5.0, 6.0], 0.00001));
       });
 
       test('allows chaining with another [] operator to return a specific value', () {
@@ -515,7 +515,7 @@ void main() {
                                  4.0, 5.0, 6.0,
                                  7.0, 8.0, 9.0], 3);
 
-        expect(matrix[1][2], equals(6.0));
+        expect(matrix[1][2], closeTo(6.0, 0.00001));
       });
     });
 
@@ -527,7 +527,7 @@ void main() {
                                   3.0, 4.0,
                                   5.0, 6.0], 2);
 
-        expect(matrix1 == matrix2, equals(false));
+        expect(matrix1 == matrix2, isFalse);
       });
 
       test('returns false for matrices of equal dimensions with different values', () {
@@ -536,7 +536,7 @@ void main() {
         var matrix2 = new Matrix([1.0, 2.0, 3.0,
                                   4.0, 5.0, 7.0], 3);
 
-        expect(matrix1 == matrix2, equals(false));
+        expect(matrix1 == matrix2, isFalse);
       });
 
       test('returns true for matrices of equal dimensions with the same values', () {
@@ -545,7 +545,7 @@ void main() {
         var matrix2 = new Matrix([1.0, 2.0, 3.0,
                                   4.0, 5.0, 6.0], 3);
 
-        expect(matrix1 == matrix2, equals(true));
+        expect(matrix1 == matrix2, isTrue);
       });
     });
   });

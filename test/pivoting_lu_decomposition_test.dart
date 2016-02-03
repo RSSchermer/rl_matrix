@@ -155,7 +155,7 @@ void main() {
         var pivotedSource = LU.pivotMatrix * sourceMatrix;
         var product = LU.lowerFactor * LU.upperFactor;
 
-        expect(product.values, pairWiseDifferenceLessThan(pivotedSource.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(pivotedSource.values, 0.00001));
       });
 
       test('for matrix:\n  1 2  4\n  3 8 14\n  2 6 13', () {
@@ -166,7 +166,7 @@ void main() {
         var pivotedSource = LU.pivotMatrix * sourceMatrix;
         var product = LU.lowerFactor * LU.upperFactor;
 
-        expect(product.values, pairWiseDifferenceLessThan(pivotedSource.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(pivotedSource.values, 0.00001));
       });
 
       test('for matrix:\n   2  5 3  5\n   4  6 6  3\n  11  3 2 -2\n   4 -7 9  3', () {
@@ -178,7 +178,7 @@ void main() {
         var pivotedSource = LU.pivotMatrix * sourceMatrix;
         var product = LU.lowerFactor * LU.upperFactor;
 
-        expect(product.values, pairWiseDifferenceLessThan(pivotedSource.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(pivotedSource.values, 0.00001));
       });
     });
 
@@ -197,7 +197,7 @@ void main() {
                                  4.0, 6.0], 2);
         var LU = new PivotingLUDecomposition(matrix);
 
-        expect((LU.determinant + 14).abs(), lessThan(0.00001));
+        expect(LU.determinant, closeTo(-14, 0.00001));
       });
 
       test('is -306 for matrix:\n  6  1 1\n  4 -2 5\n  2  8 7', () {
@@ -206,7 +206,7 @@ void main() {
                                  2.0,  8.0, 7.0], 3);
         var LU = new PivotingLUDecomposition(matrix);
 
-        expect((LU.determinant + 306).abs(), lessThan(0.00001));
+        expect(LU.determinant, closeTo(-306, 0.00001));
       });
 
       test('is 2960 for matrix:\n   2  5 3  5\n   4  6 6  3\n  11  3 2 -2\n   4 -7 9  3', () {
@@ -216,7 +216,7 @@ void main() {
                                   4.0, -7.0, 9.0,  3.0], 4);
         var LU = new PivotingLUDecomposition(matrix);
 
-        expect((LU.determinant - 2960).abs(), lessThan(0.001));
+        expect(LU.determinant, closeTo(2960, 0.001));
       });
     });
 
@@ -265,7 +265,7 @@ void main() {
         var LU = new PivotingLUDecomposition(matrix);
         var solution = LU.solve(matrix);
 
-        expect(solution.values, pairWiseDifferenceLessThan(new Matrix.identity(3).values.toList(), 0.00001));
+        expect(solution.values, orderedCloseTo(new Matrix.identity(3).values, 0.00001));
         expect(solution.columnDimension, equals(3));
       });
 
@@ -278,7 +278,7 @@ void main() {
         var solution = sourceLU.solve(targetMatrix);
         var product = sourceMatrix * solution;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
 
       test('verify `AX = B`, for the solution X and matrix A:\n  6 3 0\n  2 5 1\n  9 8 6\n And matrix B:\n   60 45\n   49 43\n  141 92', () {
@@ -292,7 +292,7 @@ void main() {
         var solution = sourceLU.solve(targetMatrix);
         var product = sourceMatrix * solution;
 
-        expect(product.values, pairWiseDifferenceLessThan(targetMatrix.values.toList(), 0.00001));
+        expect(product.values, orderedCloseTo(targetMatrix.values, 0.00001));
       });
     });
   });
