@@ -2,8 +2,8 @@ part of rl_matrix_64;
 
 /// The reduced QR-decomposition of a matrix.
 ///
-/// Decomposes an M x N matrix A, with M >= N, into an M x N orthogonal matrix Q
-/// and an N x N upper rectangular matrix R, such that `A = QR`.
+/// Decomposes an M x N matrix `A`, with `M >= N`, into an M x N orthogonal
+/// matrix `Q` and an N x N upper rectangular matrix `R`, such that `A = QR`.
 ///
 /// The primary use of the reduced QR-decomposition is in the least squares
 /// solution of non-square systems of simultaneous linear equations. This will
@@ -209,11 +209,13 @@ class ReducedQRDecomposition {
     return _orthogonalFactor;
   }
 
-  /// Solves `AX=B` for X, where A is the decomposed matrix and B the given
-  /// matrix.
+  /// Solves `AX=B` for `X`, where `A` is the decomposed matrix and [B] the
+  /// given matrix.
   ///
-  /// Throws an [ArgumentError] if the row dimensions of A and B do not match.
-  /// Throws an [UnsupportedError] if A is rank deficient (not full rank).
+  /// Throws an [ArgumentError] if the row dimensions of `A` and [B] do not
+  /// match.
+  ///
+  /// Throws an [UnsupportedError] if `A` is rank deficient (not full rank).
   GenericMatrix solve(GenericMatrix B) {
     if (B.rowDimension != _rows) {
       throw new ArgumentError('Matrix row dimensions must agree.');
@@ -267,7 +269,6 @@ class ReducedQRDecomposition {
       }
     }
 
-    return new Matrix.fromFloat64List(xVals, xCols)
-        .subMatrix(0, _cols - 1, 0, xCols - 1);
+    return new Matrix.fromFloat64List(xVals, xCols).subMatrix(0, _cols, 0, xCols);
   }
 }

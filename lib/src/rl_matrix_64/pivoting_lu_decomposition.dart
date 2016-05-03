@@ -2,14 +2,14 @@ part of rl_matrix_64;
 
 /// The lower-upper factor decomposition of a matrix, with partial pivoting.
 ///
-/// Lower-upper factor decomposition with partial pivoting of an M x N matrix A,
-/// results in 3 matrices:
+/// Lower-upper factor decomposition with partial pivoting of an M x N matrix
+/// `A`, results in 3 matrices:
 ///
-/// - L: the lower factor matrix. An M x N matrix with all zero's above the
+/// - `L`: the lower factor matrix. An M x N matrix with all zero's above the
 ///   diagonal.
-/// - U: the upper factor matrix. An N x N matrix with all zero's below the
+/// - `U`: the upper factor matrix. An N x N matrix with all zero's below the
 ///   diagonal.
-/// - P: the pivot matrix. An M x M permutation matrix.
+/// - `P`: the pivot matrix. An M x M permutation matrix.
 ///
 /// Such that `PA = LU`.
 ///
@@ -242,12 +242,15 @@ class PivotingLUDecomposition {
     return _determinant;
   }
 
-  /// Solves `AX=B` for X, where A is the decomposed matrix and B the given
+  /// Solves `AX=B` for X, where `A` is the decomposed matrix and [B] the given
   /// matrix.
   ///
-  /// Throws an [ArgumentError] if the row dimensions of A and B do not match.
-  /// Throws an [UnsupportedError] if A is singular.
-  /// Throws an [UnsupportedError] if A is not square.
+  /// Throws an [ArgumentError] if the row dimensions of `A` and [B] do not
+  /// match.
+  ///
+  /// Throws an [UnsupportedError] if `A` is not square.
+  ///
+  /// Throws an [UnsupportedError] if `A` is singular (not invertible).
   GenericMatrix solve(GenericMatrix B) {
     if (B.rowDimension != _rows) {
       throw new ArgumentError('Matrix row dimensions must agree.');
