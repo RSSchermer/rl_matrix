@@ -61,7 +61,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// Creates a matrix from the in the given [list], with the specified
   /// [columnDimension].
   ///
-  /// The row dimension will be inferred from the list's length. The list's
+  /// The [rowDimension] will be inferred from the list's length. The list's
   /// length must be a multiple of the [columnDimension].
   ///
   ///     // Instantiates the following matrix:
@@ -86,11 +86,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// Creates a matrix from the given [Float32List], with the specified
   /// [columnDimension].
   ///
-  /// The row dimension will be inferred from the list's length. The list's
+  /// The [rowDimension] will be inferred from the list's length. The list's
   /// length must be a multiple of the [columnDimension].
   ///
-  /// Throws [ArgumentError] if the value list's length is not a multiple of the
-  /// column dimension.
+  /// Throws [ArgumentError] if the list's length is not a multiple of the
+  /// [columnDimension].
   GenericMatrix.fromFloat32List(Float32List values, this.columnDimension)
       : _values = values {
     if (values.length % columnDimension != 0) {
@@ -107,11 +107,11 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   ///
   ///     // Instantiates the following matrix:
   ///     //
-  ///     //     1.0 1.0 1.0
-  ///     //     1.0 1.0 1.0
-  ///     //     1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0 1.0
   ///     //
-  ///     var matrix = new Matrix.constant(1.0, 3, 3)
+  ///     var matrix = new Matrix.constant(1.0, 3, 4);
   ///
   GenericMatrix.constant(double value, int rowDimension, int columnDimension)
       : columnDimension = columnDimension,
@@ -129,7 +129,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   ///     //     0.0 0.0 0.0 0.0
   ///     //     0.0 0.0 0.0 0.0
   ///     //
-  ///     var matrix = new Matrix.zero(3, 4)
+  ///     var matrix = new Matrix.zero(3, 4);
   ///
   GenericMatrix.zero(int rowDimension, int columnDimension)
       : columnDimension = columnDimension,
@@ -147,7 +147,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   ///     //     0.0 0.0 1.0 0.0
   ///     //     0.0 0.0 0.0 1.0
   ///     //
-  ///     var matrix = new Matrix.identity(4)
+  ///     var matrix = new Matrix.identity(4);
   ///
   GenericMatrix.identity(int size)
       : columnDimension = size,
@@ -231,7 +231,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// second row, etc.
   Iterable<double> get valuesRowPacked => new UnmodifiableListView(_values);
 
-  /// Alias for `valuesRowPacked`
+  /// Alias for [valuesRowPacked].
   Iterable<double> get values => new UnmodifiableListView(_values);
 
   /// Returns a new sub-matrix.
@@ -242,6 +242,24 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// sub-matrix will be the sub-section of the matrix delineated by these
   /// indices. The [rowStart] and [colStart] indices are inclusive. The [rowEnd]
   /// and [colEnd] indices are exclusive.
+  ///
+  /// Example:
+  ///
+  ///     // Given this matrix:
+  ///     //
+  ///     //    0.0 1.0 2.0 3.0
+  ///     //    0.1 1.1 2.1 3.1
+  ///     //    0.2 1.2 2.2 3.2
+  ///     //    0.3 1.3 2.3 3.3
+  ///     //
+  ///
+  ///     matrix.subMatrix(1, 3, 1, 3)
+  ///
+  ///     // Results in:
+  ///     //
+  ///     //    1.1 2.1
+  ///     //    1.2 2.2
+  ///     //
   ///
   /// Throws an [ArgumentError] if the [rowEnd] index is not greater than the
   /// [rowStart] index.
@@ -276,8 +294,8 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   ///
   /// Rows are zero-indexed, meaning 0 will return the first row.
   ///
-  /// Throws a [RangeError] if the [index] is out of bounds (smaller than 0 or
-  /// greater than the [rowDimension] of the matrix).
+  /// Throws a [RangeError] if the [index] is out of bounds (`index < 0` or
+  /// `index >= rowDimension`).
   List<double> rowAt(int index) {
     if (index >= rowDimension) {
       throw new RangeError.range(index, 0, rowDimension);
@@ -573,8 +591,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// Creates a matrix from the given list of [values], with the specified
   /// [columnDimension].
   ///
-  /// Creates a matrix from the given list with the specified [columnDimension].
-  /// the row dimension will be inferred from the list's length. The list's
+  /// The [rowDimension] will be inferred from the list's length. The list's
   /// length must be a multiple of the [columnDimension].
   ///
   ///     // Instantiates the following matrix:
@@ -593,7 +610,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// Creates a matrix from the in the given [list], with the specified
   /// [columnDimension].
   ///
-  /// The row dimension will be inferred from the list's length. The list's
+  /// The [rowDimension] will be inferred from the list's length. The list's
   /// length must be a multiple of the [columnDimension].
   ///
   ///     // Instantiates the following matrix:
@@ -612,11 +629,11 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   /// Creates a matrix from the given [Float32List], with the specified
   /// [columnDimension].
   ///
-  /// The row dimension will be inferred from the list's length. The list's
+  /// The [rowDimension] will be inferred from the list's length. The list's
   /// length must be a multiple of the [columnDimension].
   ///
-  /// Throws [ArgumentError] if the value list's length is not a multiple of the
-  /// column dimension.
+  /// Throws [ArgumentError] if the list's length is not a multiple of the
+  /// [columnDimension].
   Matrix.fromFloat32List(Float32List values, columnDimension)
       : super.fromFloat32List(values, columnDimension);
 
@@ -627,11 +644,11 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///
   ///     // Instantiates the following matrix:
   ///     //
-  ///     //     1.0 1.0 1.0
-  ///     //     1.0 1.0 1.0
-  ///     //     1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0 1.0
+  ///     //     1.0 1.0 1.0 1.0
   ///     //
-  ///     var matrix = new Matrix.constant(1.0, 3, 3)
+  ///     var matrix = new Matrix.constant(1.0, 3, 4);
   ///
   Matrix.constant(double value, int rowDimension, int columnDimension)
       : super.constant(value, rowDimension, columnDimension);
@@ -647,7 +664,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///     //     0.0 0.0 0.0 0.0
   ///     //     0.0 0.0 0.0 0.0
   ///     //
-  ///     var matrix = new Matrix.zero(3, 4)
+  ///     var matrix = new Matrix.zero(3, 4);
   ///
   Matrix.zero(int rowDimension, int columnDimension)
       : super.zero(rowDimension, columnDimension);
@@ -664,7 +681,7 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   ///     //     0.0 0.0 1.0 0.0
   ///     //     0.0 0.0 0.0 1.0
   ///     //
-  ///     var matrix = new Matrix.identity(4)
+  ///     var matrix = new Matrix.identity(4);
   ///
   Matrix.identity(int size) : super.identity(size);
 
@@ -674,11 +691,12 @@ class Matrix extends GenericMatrix<Matrix, Matrix> {
   Matrix transposeWithValues(Float32List newValues) =>
       new Matrix.fromFloat32List(newValues, rowDimension);
 
-  /// Returns a list containing the values in the specified row.
+  /// Returns a list containing the values in the row at the given [index].
   ///
   /// Rows are zero-indexed, meaning 0 will return the first row.
   ///
-  /// Throws [RangeError] if there is no row for the given row index.
+  /// Throws a [RangeError] if the [index] is out of bounds (`index < 0` or
+  /// `index >= rowDimension`).
   List<double> operator [](int row) => rowAt(row);
 }
 
