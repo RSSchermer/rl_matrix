@@ -1,5 +1,23 @@
 # RL-matrix Change Log
 
+## 0.5.0
+
+Changes the `rowEnd` and `colEnd` indices for `subMatrix` from being inclusive
+to being exclusive. This matches conventions in the Dart standard library.
+
+This means that the `rowEnd` and `colEnd` indices need to be incremented by
+one, e.g.:
+
+```dart
+matrix.subMatrix(0, 2, 0, 2);
+```
+
+Becomes:
+
+```dart
+matrix.subMatrix(0, 3, 0, 3);
+```
+
 ## 0.4.0
 
 Adds auto-generated implementation using `Float64List` for better precision.
