@@ -28,7 +28,7 @@ Matrices need to be instantiated with double values, using integer values will
 result in an error.
 
 For a complete overview of the operations available, have a look at the 
-[API documentation](http://www.dartdocs.org/documentation/rl_matrix/latest/index.html#rl_matrix).
+[API documentation for the Matrix class](https://www.dartdocs.org/documentation/rl_matrix/latest/rl_matrix/Matrix-class.html).
 
 ## Dimension specific matrix classes
 
