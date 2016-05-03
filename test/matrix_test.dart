@@ -104,27 +104,27 @@ void main() {
     });
 
     group('subMatrix', () {
-      test('throws and error when the starting row index is greater than the ending row index', () {
+      test('throws and error when the ending row index is not greater than the starting row index', () {
         var m = new Matrix([1.0, 2.0, 3.0,
                             1.0, 2.0, 3.0,
                             1.0, 2.0, 3.0], 3);
 
-        expect(() => m.subMatrix(1, 0, 0, 2), throwsArgumentError);
+        expect(() => m.subMatrix(1, 1, 0, 2), throwsArgumentError);
       });
 
-      test('throws and error when the starting column index is greater than the ending column index', () {
+      test('throws and error when the ending column index is not greater than the starting column index', () {
         var m = new Matrix([1.0, 2.0, 3.0,
                             1.0, 2.0, 3.0,
                             1.0, 2.0, 3.0], 3);
 
-        expect(() => m.subMatrix(0, 2, 1, 0), throwsArgumentError);
+        expect(() => m.subMatrix(0, 2, 1, 1), throwsArgumentError);
       });
 
       group('returns a new matrix', () {
         var m = new Matrix([1.0, 2.0, 3.0,
                             4.0, 5.0, 6.0,
                             7.0, 8.0, 9.0], 3);
-        var subMatrix = m.subMatrix(1, 2, 1, 2);
+        var subMatrix = m.subMatrix(1, 3, 1, 3);
 
         test('with the expected values', () {
           expect(subMatrix.values, orderedCloseTo([5.0, 6.0, 8.0, 9.0], 0.00001));
