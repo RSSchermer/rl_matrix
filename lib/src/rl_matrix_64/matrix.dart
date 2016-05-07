@@ -282,8 +282,10 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
     final subMatrixVals = new Float64List(rows * cols);
 
     for (var i = rowStart; i < rowEnd; i++) {
+      final m = (i - rowStart) * cols;
+
       for (var j = colStart; j < colEnd; j++) {
-        subMatrixVals[(i - rowStart) * cols + (j - colStart)] = valueAt(i, j);
+        subMatrixVals[m + j - colStart] = valueAt(i, j);
       }
     }
 
