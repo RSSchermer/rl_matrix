@@ -6,7 +6,7 @@ homepage: https://github.com/RSSchermer/rl_matrix
 documentation:
 dependencies:
   collection: '>=1.1.1 <2.0.0'
-  quiver: '>=0.21.0 <0.22.0'
+  quiver: '>=0.22.0 <0.23.0'
 dev_dependencies:
   path: '>=1.0.0 <2.0.0'
   test: '>=0.10.0'
