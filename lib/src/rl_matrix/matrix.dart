@@ -568,6 +568,7 @@ abstract class GenericMatrix<Self extends GenericMatrix<Self, Transpose>,
   /// Two matrices are equal if they have equal dimensions and equal values.
   /// Does not check if the types of the matrices are equal.
   bool operator ==(GenericMatrix matrix) =>
+      identical(this, matrix) ||
       columnDimension == matrix.columnDimension &&
           _iterableEquals(values, matrix.values);
 
