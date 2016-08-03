@@ -160,8 +160,8 @@ class Matrix {
   Matrix._internal(this._values, this.columnDimension);
 
   /// The transpose of this [Matrix].
-  Matrix get transpose =>
-      new Matrix._internal(new Float64List.fromList(valuesColumnPacked), rowDimension);
+  Matrix get transpose => new Matrix._internal(
+      new Float64List.fromList(valuesColumnPacked), rowDimension);
 
   /// The row dimension of this [Matrix] (number of rows).
   int get rowDimension => _values.length ~/ columnDimension;
@@ -512,7 +512,8 @@ class Matrix {
     final values =
         luDecomposition.solve(new Matrix.identity(rowDimension)).values;
 
-    _inverse = new Matrix._internal(new Float64List.fromList(values), rowDimension);
+    _inverse =
+        new Matrix._internal(new Float64List.fromList(values), rowDimension);
 
     return _inverse;
   }
