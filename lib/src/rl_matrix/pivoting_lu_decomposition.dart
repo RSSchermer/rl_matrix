@@ -1,26 +1,26 @@
 part of rl_matrix;
 
-/// The lower-upper factor decomposition of a matrix, with partial pivoting.
+/// The lower-upper factor decomposition of a [Matrix], with partial pivoting.
 ///
 /// Lower-upper factor decomposition with partial pivoting of an M x N matrix
 /// `A`, results in 3 matrices:
 ///
-/// - `L`: the lower factor matrix. An M x N matrix with all zero's above the
+/// - `L`: the lower factor matrix. An M x N [Matrix] with all zero's above the
 ///   diagonal.
-/// - `U`: the upper factor matrix. An N x N matrix with all zero's below the
+/// - `U`: the upper factor matrix. An N x N [Matrix] with all zero's below the
 ///   diagonal.
-/// - `P`: the pivot matrix. An M x M permutation matrix.
+/// - `P`: the pivot matrix. An M x M permutation [Matrix].
 ///
 /// Such that `PA = LU`.
 ///
 /// The primary use of the lower-upper decomposition is in the solution of
 /// square systems of simultaneous linear equations. This will fail if the
-/// matrix is non-singular. Pivoting reduces the impact of rounding errors.
+/// [Matrix] is non-singular. Pivoting reduces the impact of rounding errors.
 class PivotingLUDecomposition {
-  /// The source matrix.
+  /// The source [Matrix].
   ///
-  /// The matrix for which this is the LU decomposition.
-  final GenericMatrix matrix;
+  /// The [Matrix] for which this is the [PivotingLUDecomposition].
+  final Matrix matrix;
 
   /// LU decomposition values.
   Float32List _LU;
@@ -44,28 +44,28 @@ class PivotingLUDecomposition {
   /// The pivot sign.
   num _pivotSign = 1;
 
-  /// The decomposed matrix's row dimension.
+  /// The decomposed [Matrix]'s row dimension.
   int _rows;
 
-  /// The decomposed matrix's column dimension.
+  /// The decomposed [Matrix]'s column dimension.
   int _cols;
 
   /// Memoized lower factor.
-  GenericMatrix _lowerFactor;
+  Matrix _lowerFactor;
 
   /// Memoized upper factor.
-  GenericMatrix _upperFactor;
+  Matrix _upperFactor;
 
   /// Memoized pivot matrix.
-  GenericMatrix _pivotMatrix;
+  Matrix _pivotMatrix;
 
   /// Memoized determinant.
   double _determinant;
 
-  /// Creates a new lower-upper factor decomposition for the given matrix.
-  PivotingLUDecomposition(GenericMatrix matrix)
+  /// Creates a new [PivotingLUDecomposition] for the [matrix].
+  PivotingLUDecomposition(Matrix matrix)
       : matrix = matrix,
-        _LU = new Float32List.fromList(matrix.values.toList()),
+        _LU = new Float32List.fromList(matrix._values),
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
         _piv = new List<int>.generate(matrix.rowDimension, (i) => i) {
@@ -114,11 +114,11 @@ class PivotingLUDecomposition {
     }
   }
 
-  /// Whether is not the decomposed matrix is non-singular.
+  /// Whether is not the decomposed [Matrix] is non-singular.
   ///
-  /// A non-singular matrix has an inverse and a non-zero determinant.
+  /// A non-singular [Matrix] has an inverse and a non-zero determinant.
   ///
-  /// Throws an [UnsupportedError] if the decomposed matrix is not square.
+  /// Throws an [UnsupportedError] if the decomposed [Matrix] is not square.
   bool get isNonsingular {
     if (!matrix.isSquare) {
       throw new UnsupportedError('Matrix is not square.');
@@ -131,10 +131,10 @@ class PivotingLUDecomposition {
     return true;
   }
 
-  /// This decomposition's lower factor.
+  /// This [PivotingLUDecomposition]'s lower factor.
   ///
-  /// A matrix with all zero's above the diagonal.
-  GenericMatrix get lowerFactor {
+  /// A [Matrix] with all zero's above the diagonal.
+  Matrix get lowerFactor {
     if (_lowerFactor != null) {
       return _lowerFactor;
     }
@@ -158,15 +158,15 @@ class PivotingLUDecomposition {
       }
     }
 
-    _lowerFactor = new Matrix.fromFloat32List(values, _cols);
+    _lowerFactor = new Matrix._internal(values, _cols);
 
     return _lowerFactor;
   }
 
-  /// This decomposition's upper factor.
+  /// This [PivotingLUDecomposition]'s upper factor.
   ///
-  /// A matrix with all zero's below the diagonal.
-  GenericMatrix get upperFactor {
+  /// A [Matrix] with all zero's below the diagonal.
+  Matrix get upperFactor {
     if (_upperFactor != null) {
       return _upperFactor;
     }
@@ -188,15 +188,15 @@ class PivotingLUDecomposition {
       }
     }
 
-    _upperFactor = new Matrix.fromFloat32List(values, _cols);
+    _upperFactor = new Matrix._internal(values, _cols);
 
     return _upperFactor;
   }
 
-  /// This decomposition's pivot matrix.
+  /// This [PivotingLUDecomposition]'s pivot matrix.
   ///
   /// A permutation matrix.
-  GenericMatrix get pivotMatrix {
+  Matrix get pivotMatrix {
     if (_pivotMatrix != null) {
       return _pivotMatrix;
     }
@@ -216,14 +216,14 @@ class PivotingLUDecomposition {
       }
     }
 
-    _pivotMatrix = new Matrix.fromFloat32List(values, _rows);
+    _pivotMatrix = new Matrix._internal(values, _rows);
 
     return _pivotMatrix;
   }
 
-  /// The decomposed matrix's determinant.
+  /// The decomposed [Matrix]'s determinant.
   ///
-  /// Throws an [UnsupportedError] if the decomposed matrix is not square.
+  /// Throws an [UnsupportedError] if the decomposed [Matrix] is not square.
   double get determinant {
     if (!matrix.isSquare) {
       throw new UnsupportedError('Matrix must be square.');
@@ -242,8 +242,8 @@ class PivotingLUDecomposition {
     return _determinant;
   }
 
-  /// Solves `AX=B` for X, where `A` is the decomposed matrix and [B] the given
-  /// matrix.
+  /// Solves `AX=B` for X, where `A` is the decomposed [Matrix] and [B] the
+  /// given [Matrix].
   ///
   /// Throws an [ArgumentError] if the row dimensions of `A` and [B] do not
   /// match.
@@ -251,7 +251,7 @@ class PivotingLUDecomposition {
   /// Throws an [UnsupportedError] if `A` is not square.
   ///
   /// Throws an [UnsupportedError] if `A` is singular (not invertible).
-  GenericMatrix solve(GenericMatrix B) {
+  Matrix solve(Matrix B) {
     if (B.rowDimension != _rows) {
       throw new ArgumentError('Matrix row dimensions must agree.');
     }
@@ -309,6 +309,6 @@ class PivotingLUDecomposition {
       }
     }
 
-    return new Matrix.fromFloat32List(xVals, xCols);
+    return new Matrix._internal(xVals, xCols);
   }
 }

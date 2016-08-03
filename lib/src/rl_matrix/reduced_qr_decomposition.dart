@@ -1,18 +1,19 @@
 part of rl_matrix;
 
-/// The reduced QR-decomposition of a matrix.
+/// The reduced QR-decomposition of a [Matrix].
 ///
-/// Decomposes an M x N matrix `A`, with `M >= N`, into an M x N orthogonal
-/// matrix `Q` and an N x N upper rectangular matrix `R`, such that `A = QR`.
+/// Decomposes an M x N [Matrix] `A`, with `M >= N`, into an M x N orthogonal
+/// [Matrix] `Q` and an N x N upper rectangular [Matrix] `R`, such that
+/// `A = QR`.
 ///
 /// The primary use of the reduced QR-decomposition is in the least squares
 /// solution of non-square systems of simultaneous linear equations. This will
-/// fail if the matrix is rank deficient.
+/// fail if the [Matrix] is rank deficient.
 class ReducedQRDecomposition {
-  /// The source matrix.
+  /// The source [Matrix].
   ///
-  /// The matrix for which this is the QR decomposition.
-  final GenericMatrix matrix;
+  /// The [Matrix] for which this is the [ReducedQRDecomposition].
+  final Matrix matrix;
 
   /// QR decomposition values.
   Float32List _QR;
@@ -20,25 +21,25 @@ class ReducedQRDecomposition {
   /// The values on the diagonal of the upper rectangular factor.
   Float32List _Rdiag;
 
-  /// The decomposed matrix's row dimension.
+  /// The decomposed [Matrix]'s row dimension.
   num _rows;
 
-  /// The decomposed matrix's column dimension.
+  /// The decomposed [Matrix]'s column dimension.
   num _cols;
 
   /// Memoized Householder matrix.
-  GenericMatrix _householderMatrix;
+  Matrix _householderMatrix;
 
   /// Memoized upper triangular factor.
-  GenericMatrix _upperTriangularFactor;
+  Matrix _upperTriangularFactor;
 
   /// Memoized orthogonal factor.
-  GenericMatrix _orthogonalFactor;
+  Matrix _orthogonalFactor;
 
-  /// Creates a new QR-decomposition for the given matrix.
-  ReducedQRDecomposition(GenericMatrix matrix)
+  /// Creates a new [ReducedQRDecomposition] for the [matrix].
+  ReducedQRDecomposition(Matrix matrix)
       : matrix = matrix,
-        _QR = new Float32List.fromList(matrix.values.toList()),
+        _QR = new Float32List.fromList(matrix._values),
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
         _Rdiag = new Float32List(matrix.columnDimension) {
@@ -89,7 +90,7 @@ class ReducedQRDecomposition {
     }
   }
 
-  /// Whether or not the decomposed matrix is full rank.
+  /// Whether or not the decomposed [Matrix] is full rank.
   bool get isFullRank {
     for (var j = 0; j < _cols; j++) {
       if (_Rdiag[j].abs() < 0.00001) {
@@ -100,10 +101,10 @@ class ReducedQRDecomposition {
     return true;
   }
 
-  /// This decomposition's Householder matrix.
+  /// This [ReducedQRDecomposition]'s Householder matrix.
   ///
-  /// Lower trapezoidal matrix whose columns define the reflections.
-  GenericMatrix get householderMatrix {
+  /// Lower trapezoidal [Matrix] whose columns define the reflections.
+  Matrix get householderMatrix {
     if (_householderMatrix != null) {
       return _householderMatrix;
     }
@@ -125,13 +126,13 @@ class ReducedQRDecomposition {
       }
     }
 
-    _householderMatrix = new Matrix.fromFloat32List(values, _cols);
+    _householderMatrix = new Matrix._internal(values, _cols);
 
     return _householderMatrix;
   }
 
-  /// This decomposition's upper triangular factor R.
-  GenericMatrix get upperTriangularFactor {
+  /// This [ReducedQRDecomposition]'s upper triangular factor R.
+  Matrix get upperTriangularFactor {
     if (_upperTriangularFactor != null) {
       return _upperTriangularFactor;
     }
@@ -155,13 +156,13 @@ class ReducedQRDecomposition {
       }
     }
 
-    _upperTriangularFactor = new Matrix.fromFloat32List(values, _cols);
+    _upperTriangularFactor = new Matrix._internal(values, _cols);
 
     return _upperTriangularFactor;
   }
 
-  /// This decomposition's orthogonal factor Q.
-  GenericMatrix get orthogonalFactor {
+  /// This [ReducedQRDecomposition]'s orthogonal factor Q.
+  Matrix get orthogonalFactor {
     if (_orthogonalFactor != null) {
       return _orthogonalFactor;
     }
@@ -204,19 +205,19 @@ class ReducedQRDecomposition {
       }
     }
 
-    _orthogonalFactor = new Matrix.fromFloat32List(values, _cols);
+    _orthogonalFactor = new Matrix._internal(values, _cols);
 
     return _orthogonalFactor;
   }
 
-  /// Solves `AX=B` for `X`, where `A` is the decomposed matrix and [B] the
-  /// given matrix.
+  /// Solves `AX=B` for `X`, where `A` is the decomposed [Matrix] and [B] the
+  /// given [Matrix].
   ///
   /// Throws an [ArgumentError] if the row dimensions of `A` and [B] do not
   /// match.
   ///
   /// Throws an [UnsupportedError] if `A` is rank deficient (not full rank).
-  GenericMatrix solve(GenericMatrix B) {
+  Matrix solve(Matrix B) {
     if (B.rowDimension != _rows) {
       throw new ArgumentError('Matrix row dimensions must agree.');
     }
@@ -269,6 +270,6 @@ class ReducedQRDecomposition {
       }
     }
 
-    return new Matrix.fromFloat32List(xVals, xCols).subMatrix(0, _cols, 0, xCols);
+    return new Matrix._internal(xVals, xCols).subMatrix(0, _cols, 0, xCols);
   }
 }
