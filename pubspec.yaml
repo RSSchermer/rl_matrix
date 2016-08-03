@@ -1,5 +1,5 @@
 name: rl_matrix
-version: 0.5.4
+version: 0.6.0
 author: R.S. Schermer <roland0507@gmail.com>
 description: Provides an immutable implementation for matrices of real numbers in Dart, based on Java's JAMA package.
 homepage: https://github.com/RSSchermer/rl_matrix

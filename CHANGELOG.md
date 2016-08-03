@@ -1,5 +1,39 @@
 # RL-matrix Change Log
 
+## 0.6.0
+
+- BREAKING: removes `GenericMatrix`class. This felt like a really 
+  over-engineered solution and required some leakiness with regards to the
+  immutability. The core of this library is now much less complex. If you were
+  using `GenericMatrix`, please open an issue.
+- BREAKING: removes `Matrix.withValues`. Was only necessary to support the
+  `GenericMatrix` construct.
+- BREAKING: removes `Matrix.withValuesTranspose`. Was only necessary to support 
+  the `GenericMatrix` construct.
+- BREAKING: removes `fromFloat32List` constructor. Use `fromList` instead.
+- BREAKING: removes `[]` operator from matrix class. Use `Matrix.rowAt` instead.
+- BREAKING: replaces `Matrix`'s default constructor. The default constructor now
+  takes a list of lists:
+  
+  ```dart
+  var matrix = new Matrix([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+    [7.0, 8.0, 9.0]
+  ]);
+  ```
+  
+  Each list represents a row in the matrix. All row lists must of of equal 
+  length.
+
+  The `Matrix` class' default constructor behaved identically to the `fromList` 
+  constructor. The simplest way to fix existing code that used the default
+  constructor is to run a "replace all" for `new Matrix(` with 
+  `new Matrix.fromList(`.
+
+This release includes some sweeping breaking changes. However, I feel these
+changes address most of the issues I had with the library in its prior state.
+
 ## 0.5.0
 
 Changes the `rowEnd` and `colEnd` indices for `subMatrix` from being inclusive
