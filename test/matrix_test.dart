@@ -5,9 +5,46 @@ import 'helpers.dart';
 void main() {
   group('Matrix', () {
     group('constructors', () {
-      test('strict value list length checking', () {
-        expect(() => new Matrix.fromList([1.0, 2.0], 3), throwsArgumentError);
-        expect(() => new Matrix.fromList([1.0, 2.0, 3.0, 4.0], 3), throwsArgumentError);
+      group('default', () {
+        test('with an empty rowList throws an ArgumentError', () {
+          expect(() => new Matrix([]), throwsArgumentError);
+        });
+
+        test('with a rowList that contains lists of differing lengths', () {
+          expect(() => new Matrix([[1.0, 2.0], [3.0, 4.0, 5.0]]), throwsArgumentError);
+        });
+
+        group('with a valid rowList', () {
+          var matrix = new Matrix([
+            [1.0, 2.0, 3.0],
+            [4.0, 5.0, 6.0]
+          ]);
+
+          test('returns a matrix with the correct columnDimension', () {
+            expect(matrix.columnDimension, equals(3));
+          });
+
+          test('returns a matrix with the correct rowDimension', () {
+            expect(matrix.rowDimension, equals(2));
+          });
+
+          test('returns a matrix with the correct values', () {
+            expect(matrix.values, orderedCloseTo([
+              1.0, 2.0, 3.0,
+              4.0, 5.0, 6.0
+            ], 0.00001));
+          });
+        });
+      });
+
+      group('fromList', () {
+        test('with a list whose length is smaller than the column dimension', () {
+          expect(() => new Matrix.fromList([1.0, 2.0], 3), throwsArgumentError);
+        });
+
+        test('with a list whose length is greater than the column dimension', () {
+          expect(() => new Matrix.fromList([1.0, 2.0, 3.0, 4.0], 3), throwsArgumentError);
+        });
       });
 
       test('constant matrix', () {

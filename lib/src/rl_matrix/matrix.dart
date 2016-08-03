@@ -28,6 +28,55 @@ class Matrix {
   /// Memoized inverse matrix.
   Matrix _inverse;
 
+  /// Creates a [Matrix] from the given [rowLists].
+  ///
+  /// The [rowList] is a list of lists, where each list contains the values for
+  /// a single row. The [Matrix]'s row dimension will be the number of row
+  /// value lists. The [Matrix]'s column dimension will be the length of the
+  /// lists of row values.
+  ///
+  ///     // Instantiates the following matrix:
+  ///     //
+  ///     //     1.0 2.0 3.0
+  ///     //     4.0 5.0 6.0
+  ///     //
+  ///     var matrix = new Matrix([
+  ///       [1.0, 2.0, 3.0],
+  ///       [4.0, 5.0, 6.0]
+  ///     ]);
+  ///
+  /// Throws an [ArgumentError] if the length of each row value list is not
+  /// equal.
+  ///
+  /// Throws an [ArgumentError] if the length of [rowLists] is `0`.
+  factory Matrix(List<List<double>> rowLists) {
+    if (rowLists.length == 0) {
+      throw new ArgumentError('At least one rowList must be supplied, the '
+          'length of rowLists must not be 0.');
+    }
+
+    final columnDimension = rowLists.first.length;
+    final rowDimension = rowLists.length;
+    final values = new Float32List(columnDimension * rowDimension);
+
+    for (var i = 0; i < rowDimension; i++) {
+      final row = rowLists[i];
+      final m = i * columnDimension;
+
+      if (row.length != columnDimension) {
+        throw new ArgumentError('The length of row $i (${row.length}) does not '
+            'match the length of the prior row(s) ($columnDimension). All rows '
+            'must be of equal length.');
+      }
+
+      for (var j = 0; j < columnDimension; j++) {
+        values[m + j] = row[j];
+      }
+    }
+
+    return new Matrix._internal(values, columnDimension);
+  }
+
   /// Creates a [Matrix] from the in the given [list], with the specified
   /// [columnDimension].
   ///
@@ -39,8 +88,10 @@ class Matrix {
   ///     //     1.0 2.0 3.0
   ///     //     4.0 5.0 6.0
   ///     //
-  ///     var matrix = new Matrix.fromList([1.0, 2.0, 3.0,
-  ///                                       4.0, 5.0, 6.0], 3);
+  ///     var matrix = new Matrix.fromList([
+  ///       1.0, 2.0, 3.0,
+  ///       4.0, 5.0, 6.0
+  ///     ], 3);
   ///
   /// Throws [ArgumentError] if the [list]'s length is not a multiple of the
   /// [columnDimension].
