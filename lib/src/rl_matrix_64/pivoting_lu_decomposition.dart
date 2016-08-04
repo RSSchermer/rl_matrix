@@ -65,7 +65,7 @@ class PivotingLUDecomposition {
   /// Creates a new [PivotingLUDecomposition] for the [matrix].
   PivotingLUDecomposition(Matrix matrix)
       : matrix = matrix,
-        _LU = new Float64List.fromList(matrix._values),
+        _LU = new Float64List.fromList(matrix.values.toList()),
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
         _piv = new List<int>.generate(matrix.rowDimension, (i) => i) {

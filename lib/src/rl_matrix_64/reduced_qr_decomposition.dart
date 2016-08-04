@@ -39,7 +39,7 @@ class ReducedQRDecomposition {
   /// Creates a new [ReducedQRDecomposition] for the [matrix].
   ReducedQRDecomposition(Matrix matrix)
       : matrix = matrix,
-        _QR = new Float64List.fromList(matrix._values),
+        _QR = new Float64List.fromList(matrix.values.toList()),
         _rows = matrix.rowDimension,
         _cols = matrix.columnDimension,
         _Rdiag = new Float64List(matrix.columnDimension) {
@@ -228,7 +228,7 @@ class ReducedQRDecomposition {
 
     // Copy right hand side
     final xCols = B.columnDimension;
-    final xVals = new Float64List.fromList(B.values);
+    final xVals = new Float64List.fromList(B.values.toList());
 
     // Compute Y = transpose(Q)*B
     for (var k = 0; k < _cols; k++) {
