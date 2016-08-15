@@ -553,10 +553,10 @@ class Matrix {
   ///
   /// Two matrices are equal if they have equal dimensions and equal values.
   /// Does not check if the types of the matrices are equal.
-  bool operator ==(Matrix matrix) =>
-      identical(this, matrix) ||
-      columnDimension == matrix.columnDimension &&
-          _iterableEquals(values, matrix.values);
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Matrix &&
+      columnDimension == other.columnDimension &&
+          _iterableEquals(values, other.values);
 
   int get hashCode =>
       hash3(columnDimension, rowDimension, hashObjects(_values));

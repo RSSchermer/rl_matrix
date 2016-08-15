@@ -188,7 +188,7 @@ void main() {
           6.0, 3.0
         ], 2);
         var LU = new PivotingLUDecomposition(sourceMatrix);
-        var pivotedSource = LU.pivotMatrix * sourceMatrix;
+        Matrix pivotedSource = LU.pivotMatrix * sourceMatrix;
         var product = LU.lowerFactor * LU.upperFactor;
 
         expect(product.values, orderedCloseTo(pivotedSource.values, 0.00001));
@@ -201,7 +201,7 @@ void main() {
           2.0, 6.0, 13.0
         ], 3);
         var LU = new PivotingLUDecomposition(sourceMatrix);
-        var pivotedSource = LU.pivotMatrix * sourceMatrix;
+        Matrix pivotedSource = LU.pivotMatrix * sourceMatrix;
         var product = LU.lowerFactor * LU.upperFactor;
 
         expect(product.values, orderedCloseTo(pivotedSource.values, 0.00001));
@@ -215,7 +215,7 @@ void main() {
            4.0, -7.0, 9.0,  3.0
         ], 4);
         var LU = new PivotingLUDecomposition(sourceMatrix);
-        var pivotedSource = LU.pivotMatrix * sourceMatrix;
+        Matrix pivotedSource = LU.pivotMatrix * sourceMatrix;
         var product = LU.lowerFactor * LU.upperFactor;
 
         expect(product.values, orderedCloseTo(pivotedSource.values, 0.00001));

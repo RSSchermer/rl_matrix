@@ -68,7 +68,7 @@ class ReducedQRDecomposition {
 
         // Apply transformation to remaining columns.
         for (var j = k + 1; j < _cols; j++) {
-          var s = 0;
+          var s = 0.0;
 
           for (var i = k; i < _rows; i++) {
             var n = i * _cols;
@@ -235,7 +235,7 @@ class ReducedQRDecomposition {
       final m = k * _cols;
 
       for (var j = 0; j < xCols; j++) {
-        var s = 0;
+        var s = 0.0;
 
         for (var i = k; i < _rows; i++) {
           final n = i * _cols;
